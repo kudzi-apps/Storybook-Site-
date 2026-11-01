@@ -1,1 +1,39 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080808"><title>Visual Storyteller — Stories worth keeping</title><meta name="description" content="Photography, film and digital experiences by Visual Storyteller, Harare."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="./src/styles.css"></head><body><header class="topbar"><a class="brand" href="#"><span class="brand-mark">VS</span><span>VISUAL<br>STORYTELLER</span></a><div class="top-note">HARARE · ZIMBABWE</div><button class="quote-open" id="quote-open">GET A QUOTE <span>↗</span></button></header><main><section class="hero-intro"><span class="eyebrow">IMAGES WITH A POINT OF VIEW</span><h1>Make it<br><em>mean something.</em></h1><p>Photography, film and digital experiences made to hold a little longer.</p></section><div class="spatial-wrap"><section class="spatial" id="spatial"><div class="stack left"><button class="service-card" data-service="Photography"><img src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1000&q=85" alt="Wedding photography"><span class="card-index">01 / PHOTOGRAPHY</span><span class="card-title">Photography</span><span class="card-sub">Portraits · Weddings · Events</span></button><button class="service-card" data-service="Videography"><img src="https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?auto=format&fit=crop&w=1000&q=85" alt="Filmmaking camera"><span class="card-index">02 / FILM</span><span class="card-title">Videography</span><span class="card-sub">Films · Reels · Commercial</span></button></div><div class="stack right"><button class="service-card" data-service="Drone"><img src="https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=1000&q=85" alt="Aerial drone landscape"><span class="card-index">03 / AERIAL</span><span class="card-title">Drone</span><span class="card-sub">Aerial · Property · Events</span></button><button class="service-card" data-service="Digital Experiences"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=85" alt="Digital wedding experience"><span class="card-index">04 / DIGITAL</span><span class="card-title">Digital Experiences</span><span class="card-sub">Storybook · Websites · Campaigns</span></button></div></section><div id="depth-stage" class="depth-stage hidden"></div></div><section class="service-detail hidden" id="service-detail"><button class="back" id="back">← BACK TO THE STUDIO</button><div id="detail-content"></div></section><div class="progress"><span id="progress-label">01</span><input id="progress" type="range" min="1" max="4" value="1" aria-label="Navigate service cards"><span>04</span></div></main><footer class="bottombar"><span>VISUAL STORYTELLER © 2026</span><div class="socials"><a href="https://beacons.ai/storytellervs" target="_blank" rel="noreferrer">BEACONS ↗</a><a href="https://www.instagram.com/storytellervs/" target="_blank" rel="noreferrer">INSTAGRAM ↗</a><a href="https://www.youtube.com/@storytellervs" target="_blank" rel="noreferrer">YOUTUBE ↗</a></div><span>MADE IN HARARE</span></footer><div id="quote-modal" class="quote-modal hidden" role="dialog" aria-modal="true" aria-labelledby="quote-title"><div class="quote-panel"><button class="close" id="quote-close">×</button><span class="eyebrow">LET'S MAKE SOMETHING</span><h2 id="quote-title">Build your quote.</h2><p class="muted">Choose what you need. Your estimate updates as you go.</p><div id="quote-options"></div><div class="quote-total"><span>ESTIMATED TOTAL</span><strong id="total">$0</strong></div><button class="submit-quote" id="submit-quote">REQUEST THIS QUOTE ↗</button><p class="fine">50% deposit to confirm a booking. Quotes are valid for 7 days. This preview does not submit a live enquiry.</p></div></div><script type="module" src="./src/main.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090a0c">
+<title>Visual Storyteller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./index.html" aria-label="Visual Storyteller home"><span class="brand-mark">VS</span><span>VISUAL STORYTELLER</span></a>
+  <button class="top-action" id="contact">CONTACT <span>↗</span></button>
+</header>
+<main class="stage" id="stage">
+  <div class="world" id="world">
+    <div class="stack" id="stack" aria-label="Services"></div>
+  </div>
+  <div class="side-hint" id="hint">SCROLL TO EXPLORE</div>
+  <div class="counter"><span id="current">01</span><i></i><span id="total">04</span></div>
+</main>
+<footer class="bottombar">
+  <button class="bar-control" id="previous" aria-label="Previous card">←</button>
+  <div class="bar-center"><span id="section-name">PHOTOGRAPHY</span><span class="bar-divider"></span><span id="section-position">01 / 04</span></div>
+  <button class="bar-control" id="next" aria-label="Next card">→</button>
+</footer>
+<div class="contact-layer" id="contact-layer" aria-hidden="true">
+  <button class="contact-close" id="contact-close" aria-label="Close">×</button>
+  <a href="https://beacons.ai/storytellervs" target="_blank" rel="noreferrer">BEACONS ↗</a>
+  <a href="https://www.instagram.com/storytellervs/" target="_blank" rel="noreferrer">INSTAGRAM ↗</a>
+  <a href="https://www.youtube.com/@storytellervs" target="_blank" rel="noreferrer">YOUTUBE ↗</a>
+  <a href="mailto:emailvstoryteller@gmail.com">EMAIL ↗</a>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
