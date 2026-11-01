@@ -1,1 +1,128 @@
-const $=s=>document.querySelector(s);const cards=[...document.querySelectorAll(".service-card")];const services={Photography:{tag:"01 / PHOTOGRAPHY",intro:"Photographs that feel like the moment did.",body:"Portraits, weddings, events and commercial work. Choose a story to explore.",image:"https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1400&q=85",items:[["Weddings","Wedding coverage, collections and keepsakes"],["Portraits","Individual, couple and family sessions"],["Events","Celebrations, launches and gatherings"],["Commercial","People, products and brand imagery"]]},Videography:{tag:"02 / VIDEOGRAPHY",intro:"Moving pictures. Lasting feeling.",body:"Films shaped around the people, places and moments worth keeping.",image:"https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?auto=format&fit=crop&w=1400&q=85",items:[["Weddings","Highlights, ceremony and full-day films"],["Commercial","Product films and business showcases"],["Social films","Short-form reels and campaign content"],["Music videos","Performance-led visual storytelling"]]},Drone:{tag:"03 / AERIAL",intro:"A different point of view.",body:"Aerial footage and photography for events, properties and places.",image:"https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=1400&q=85",items:[["Events","Aerial coverage and establishing shots"],["Properties","Land, homes and commercial spaces"],["Locations","Travel, tourism and landscape"],["Custom projects","Tell us what you have in mind"]]}, "Digital Experiences":{tag:"04 / DIGITAL",intro:"Stories that people can step into.",body:"Digital experiences that bring people together and make information feel considered.",image:"https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=85",items:[["Storybook","Wedding invitations and guest experiences"],["Websites","Small-business and personal websites"],["Digital campaigns","Landing pages and campaign experiences"],["Custom builds","A digital idea, made real"]]}};const leaf={Weddings:[["Lite","4 hours · 120 edited photographs + highlight film"],["Plus","8 hours · 250 edited photographs + highlight film"],["Director’s","10 hours · 450 edited photographs + highlight film"]],Portraits:[["Lite","A concise portrait session"],["Plus","An extended portrait session"],["Director’s","A considered editorial session"]],Events:[["Lite","Essential event coverage"],["Plus","Extended event coverage"],["Director’s","Full event storytelling"]],Commercial:[["Photography","Product, people and brand photography"],["Videography","Business films and product adverts"],["Enquire","Build a brief for your project"]],Storybook:[["Lite","A beautiful digital invitation"],["Plus","A richer guest experience"],["Director’s","The complete wedding experience"]],Websites:[["Lite","A focused one-page website"],["Plus","A multi-section business website"],["Director’s","A bespoke digital experience"]], "Social films":[["30-second reel","Short-form social video"],["Campaign set","A coordinated set of short films"],["Enquire","Custom scope and quote"]], "Music videos":[["Performance","A focused performance video"],["Concept","A developed visual concept"],["Enquire","Custom production quote"]], "Custom projects":[["Discuss your brief","Tell us what you want to create"]], "Aerial coverage":[["Event aerials","Aerial stills and video"],["Property aerials","Property and land coverage"],["Enquire","Custom aerial brief"]]};let trail=[];let depth=0;function openLayer(name,items,description,level){trail.push({name,items,description,level});renderLayer()}function renderLayer(){const stage=$("#depth-stage");const layer=trail[trail.length-1];if(!layer){stage.classList.add("hidden");$("#spatial").classList.remove("is-deep");return}$("#spatial").classList.add("is-deep");stage.classList.remove("hidden");stage.innerHTML='<section class="depth-panel"><button class="depth-back" id="depth-back">← '+(trail.length===1?"BACK TO THE STUDIO":"BACK")+'</button><div class="depth-meta">'+layer.level+'</div><h2>'+layer.name+'</h2><p>'+layer.description+'</p><div class="depth-items">'+layer.items.map((it,i)=>'<button class="depth-item" data-index="'+i+'"><span>'+it[0]+'</span><span>↗</span></button>').join("")+'</div></section>';$("#depth-back").onclick=()=>{trail.pop();renderLayer()};stage.querySelectorAll(".depth-item").forEach((b,i)=>b.onclick=()=>{const item=layer.items[i],next=leaf[item[0]];if(next){openLayer(item[0],next,item[1],layer.level+" / "+String(i+1).padStart(2,"0"))}else{openLayer(item[0],[["Build a quote","Choose a package and request a tailored estimate"],["Contact the studio","Talk through the details of your project"]],item[1],layer.level+" / "+String(i+1).padStart(2,"0"))}})}function selectCard(card){const name=card.dataset.service;cards.forEach(c=>c.classList.toggle("is-selected",c===card));openLayer(name,services[name].items,services[name].body,services[name].tag)}cards.forEach(c=>c.onclick=()=>selectCard(c));$("#depth-stage").classList.add("hidden");$("#progress").value=2;$("#progress-label").textContent="02";function updateDepth(n){$("#progress-label").textContent=String(n).padStart(2,"0");$("#spatial").style.transform="translateY("+(n-2.5)*-13+"px) translateZ("+(2.5-n)*55+"px) rotateX("+(n-2.5)*1.5+"deg)";document.querySelectorAll(".stack").forEach(stack=>{const rear=stack.children[0],front=stack.children[1];rear.style.transform="translate3d(0,"+(-22+(2.5-n)*24)+"px,"+(-190+(2.5-n)*125)+"px) scale("+(0.86+(2.5-n)*.025)+")";front.style.transform="translate3d(0,"+(25+(2.5-n)*-8)+"px,"+((2.5-n)*24)+"px) scale(1)";});}$("#progress").oninput=e=>updateDepth(+e.target.value);updateDepth(2.5);let wheelLock=false;document.querySelector(".spatial-wrap").addEventListener("wheel",e=>{if(wheelLock)return;wheelLock=true;const range=$("#progress");range.value=Math.max(1,Math.min(4,+range.value+(e.deltaY>0?1:-1)));range.dispatchEvent(new Event("input"));setTimeout(()=>wheelLock=false,350)},{passive:true});const catalogue=[{group:"Photography",opts:[["Lite · 15 edited photographs",30],["Plus · 30 edited photographs",50],["Director’s · 50 edited photographs",80]]},{group:"Weddings",opts:[["Wedding Lite · 4 hours · 120 photos + film",250],["Wedding Plus · 8 hours · 250 photos + film",400],["Wedding Director’s · 10 hours · 450 photos + film",600]]},{group:"Videography",opts:[["Social reel · 30 sec",40],["Product advert · 30 sec",50],["Business showcase · 2 min",70],["Long-form · up to 30 min",60],["Long-form · up to 60 min",80],["Music video · provisional",80]]},{group:"Storybook",opts:[["Storybook Lite",30],["Storybook Plus",60]]},{group:"Add-ons",opts:[["Premium Storybook upgrade (wedding Lite/Plus)",30],["Additional Storybook page or feature",20],["Harare travel (non-wedding bookings)",10]]}];let selected=[];function openQuote(){trail=[];renderLayer();$("#quote-modal").classList.remove("hidden");$("#quote-options").innerHTML=catalogue.map(g=>'<section class="option-group"><h3>'+g.group+'</h3><div class="option-grid">'+g.opts.map(o=>'<label class="option"><input type="checkbox" data-price="'+o[1]+'" data-name="'+o[0]+'"><span>'+o[0]+'</span><b>$'+o[1]+'</b></label>').join("")+'</div></section>').join("");$("#quote-options").querySelectorAll("input").forEach(i=>i.onchange=updateTotal);updateTotal()}function updateTotal(){selected=[...$("#quote-options").querySelectorAll("input:checked")];$("#total").textContent="$"+selected.reduce((n,i)=>n+Number(i.dataset.price),0).toFixed(2)}$("#quote-open").onclick=openQuote;$("#quote-close").onclick=()=>$("#quote-modal").classList.add("hidden");$("#quote-modal").onclick=e=>{if(e.target.id==="quote-modal")$("#quote-modal").classList.add("hidden")};$("#submit-quote").onclick=()=>alert("This is a design preview. To request a live quote, contact Visual Storyteller via Beacons.");
+const services = [
+  {name:"Photography", image:"https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1400&q=88", children:[
+    ["Weddings","Wedding coverage and keepsakes"],["Portraits","Individual, couple and family sessions"],["Events","Celebrations, launches and gatherings"],["Commercial","People, products and brand imagery"]
+  ]},
+  {name:"Digital Experiences", image:"https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=88", children:[
+    ["Storybook","Digital wedding invitations and guest experiences"],["Websites","Business and personal websites"],["Campaigns","Landing pages and campaign experiences"],["Custom builds","Bespoke digital projects"]
+  ]},
+  {name:"Drone", image:"https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=1400&q=88", children:[
+    ["Events","Aerial event coverage"],["Properties","Land, homes and commercial spaces"],["Locations","Travel, tourism and landscapes"],["Custom projects","Bespoke aerial work"]
+  ]},
+  {name:"Videography", image:"https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?auto=format&fit=crop&w=1400&q=88", children:[
+    ["Weddings","Highlights, ceremony and full-day films"],["Commercial","Product films and business showcases"],["Social films","Short-form reels and campaigns"],["Music videos","Performance-led visual storytelling"]
+  ]}
+];
+const stack = document.querySelector("#stack");
+const world = document.querySelector("#world");
+const current = document.querySelector("#current");
+const total = document.querySelector("#total");
+const sectionName = document.querySelector("#section-name");
+const sectionPosition = document.querySelector("#section-position");
+const hint = document.querySelector("#hint");
+let path = [];
+let items = services;
+let index = 0;
+let touchY = 0;
+let wheelBusy = false;
+const pad = n => String(n).padStart(2,"0");
+const activeItems = () => path.length ? path[path.length-1].items : services;
+function render(){
+  items = activeItems();
+  index = Math.max(0,Math.min(index,items.length-1));
+  stack.innerHTML = "";
+  items.forEach((item,i)=>{
+    const card = document.createElement("button");
+    card.className = "card";
+    card.type = "button";
+    card.style.setProperty("--position",i-index);
+    if(path.length===0){
+      card.classList.add("service-card");
+      card.style.setProperty("--image",`url("${item.image}")`);
+    } else {
+      card.classList.add("menu-card");
+      const parent = path[path.length-1].name;
+      card.innerHTML = `<span class="card-number">${pad(i+1)}</span><span class="card-name">${item[0]}</span><span class="card-arrow">↗</span>`;
+      card.dataset.description = item[1];
+    }
+    if(path.length===0) card.innerHTML = `<span class="card-number">${pad(i+1)}</span><span class="card-name">${item.name}</span><span class="card-arrow">↗</span>`;
+    card.setAttribute("aria-label",path.length===0?item.name:item[0]);
+    card.addEventListener("click",()=>choose(i));
+    stack.append(card);
+  });
+  const selected=items[index];
+  current.textContent=pad(index+1);
+  total.textContent=pad(items.length);
+  sectionName.textContent=path.length?path.map(p=>p.name.toUpperCase()).join(" / "):selected.name.toUpperCase();
+  sectionPosition.textContent=pad(index+1)+" / "+pad(items.length);
+  hint.textContent=path.length?"SELECT A CATEGORY":"SCROLL TO EXPLORE";
+  document.querySelector("#previous").disabled=index===0&&!path.length;
+  document.querySelector("#next").disabled=index===items.length-1&&!path.length;
+  layout();
+}
+function layout(){
+  [...stack.children].forEach((card,i)=>{
+    const offset=i-index;
+    card.style.setProperty("--y",`${offset*23}px`);
+    card.style.setProperty("--z",`${-Math.abs(offset)*115}px`);
+    card.style.setProperty("--scale",String(1-Math.abs(offset)*.055));
+    card.style.setProperty("--rotate",`${offset*-1.3}deg`);
+    card.style.setProperty("--opacity",String(Math.max(.28,1-Math.abs(offset)*.16)));
+    card.classList.toggle("is-active",i===index);
+    card.style.zIndex=String(100-Math.abs(offset));
+  });
+  world.style.setProperty("--depth",`${index*18}px`);
+}
+function choose(i){
+  index=i;
+  const item=items[i];
+  if(!path.length){
+    path.push({name:item.name,items:item.children});
+    index=0;
+    render();
+    return;
+  }
+  const description=item[1];
+  const leafName=item[0];
+  path.push({name:leafName,items:[
+    {label:"Lite",detail:"A focused option"},
+    {label:"Plus",detail:"An expanded option"},
+    {label:"Director’s",detail:"The complete experience"}
+  ],description});
+  index=0;
+  render();
+}
+function back(){
+  if(path.length){path.pop();index=0;render();}
+}
+function move(delta){
+  const next=index+delta;
+  if(next<0){if(path.length)back();return;}
+  if(next>=items.length)return;
+  index=next;render();
+}
+document.querySelector("#previous").addEventListener("click",()=>move(-1));
+document.querySelector("#next").addEventListener("click",()=>move(1));
+stack.addEventListener("wheel",e=>{
+  e.preventDefault();if(wheelBusy)return;wheelBusy=true;
+  if(Math.abs(e.deltaY)>4)move(e.deltaY>0?1:-1);
+  setTimeout(()=>wheelBusy=false,520);
+},{passive:false});
+stack.addEventListener("touchstart",e=>{touchY=e.touches[0].clientY},{passive:true});
+stack.addEventListener("touchend",e=>{
+  const delta=touchY-e.changedTouches[0].clientY;
+  if(Math.abs(delta)>35)move(delta>0?1:-1);
+},{passive:true});
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"||e.key==="ArrowRight")move(1);
+  if(e.key==="ArrowUp"||e.key==="ArrowLeft")move(-1);
+  if(e.key==="Escape")back();
+});
+document.querySelector("#contact").addEventListener("click",()=>{
+  document.querySelector("#contact-layer").classList.add("open");
+  document.querySelector("#contact-layer").setAttribute("aria-hidden","false");
+});
+document.querySelector("#contact-close").addEventListener("click",()=>{
+  document.querySelector("#contact-layer").classList.remove("open");
+  document.querySelector("#contact-layer").setAttribute("aria-hidden","true");
+});
+render();
