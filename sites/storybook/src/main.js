@@ -22,7 +22,7 @@ $("#stage").innerHTML='<div class="carousel" aria-label="Storybook pages">'+orde
 const key=idx===0&&accepted?"home":pages[idx],item=details[key];
 return '<button class="story-card '+(pos===1?"is-active":"is-side")+'" data-page="'+idx+'" aria-label="Open '+(key==="rsvp"?"RSVP":key)+'"><img src="'+item.image+'" alt="" loading="eager"><span class="card-shade"></span><span class="card-content"><small>'+item.kicker+'</small><strong>'+item.title+'</strong><span class="card-description">'+item.description+'</span><span class="card-action">'+item.action+' ↗</span></span></button>';
 }).join("")+'</div><div class="pagination">'+pages.map((p,i)=>'<button data-dot="'+i+'" class="'+(i===current?"active":"")+'" aria-label="Go to '+(i===0?(accepted?"Home":"RSVP"):p)+'"></button>').join("")+'</div>';
-$("#stage").querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{const key=Number(b.dataset.page)===0&&accepted?"home":pages[Number(b.dataset.page)];if(key==="rsvp"||key==="home")openModal("rsvp");else openModal(key);});
+$("#stage").querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{const index=Number(b.dataset.page);if(index!==current){setPage(index);return;}const key=activeKey();openModal(key==="home"?"rsvp":key);});
 $("#stage").querySelectorAll("[data-dot]").forEach(b=>b.onclick=()=>setPage(Number(b.dataset.dot)));
 }
 function setPage(i){current=(i+3)%3;render();}
