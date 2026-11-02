@@ -42,8 +42,8 @@ if(world&&!reduce&&window.matchMedia("(hover:hover)").matches){
   if(frame)cancelAnimationFrame(frame);
   frame=requestAnimationFrame(()=>{
    const x=(e.clientX/innerWidth-.5),y=(e.clientY/innerHeight-.5);
-   world.style.setProperty("--tilt-y",(x*9).toFixed(2)+"deg");
-   world.style.setProperty("--tilt-x",(-y*6).toFixed(2)+"deg");
+   world.style.setProperty("--tilt-y",(x*3.2).toFixed(2)+"deg");
+   world.style.setProperty("--tilt-x",(-y*2.2).toFixed(2)+"deg");
   });
  },{passive:true});
  world.addEventListener("pointerleave",()=>{
