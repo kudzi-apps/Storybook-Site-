@@ -114,11 +114,11 @@ footer{
 .spatial-floor:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 25%,transparent 0 25%,rgba(0,0,0,.38) 85%);pointer-events:none}
 .spatial-tile{
  --x:0%;--y:0%;--z:0;--r:0deg;--w:20%;
- position:absolute;left:50%;top:51%;z-index:calc(4 + var(--z));
+ position:absolute;left:calc(50% + var(--x));top:calc(50% + var(--y));z-index:calc(4 + var(--z));
  width:var(--w);aspect-ratio:1.24;
  padding:0;border:1px solid rgba(255,255,255,.48);border-radius:3px;
  background:#171717;overflow:hidden;cursor:pointer;text-align:left;
- transform:translate3d(var(--x),var(--y),calc(var(--z)*-52px)) rotate(var(--r));
+ transform:translate(-50%,-50%) translateZ(calc(var(--z)*-52px)) rotate(var(--r));
  transform-style:preserve-3d;
  box-shadow:0 16px 28px rgba(0,0,0,.55),0 2px 5px rgba(0,0,0,.7);
  transition:transform .55s cubic-bezier(.2,.75,.25,1),box-shadow .4s,border-color .4s,filter .4s;
@@ -131,7 +131,7 @@ footer{
 .tile-copy b{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(14px,1.65vw,23px);font-weight:600;line-height:1}
 .tile-copy i{font-size:8px;font-style:normal;letter-spacing:.08em;color:#fff;opacity:0;transform:translateY(5px);transition:.25s}
 .spatial-tile:hover,.spatial-tile:focus-visible,.spatial-tile.is-selected{
- z-index:20;transform:translate3d(var(--x),var(--y),150px) rotate(0deg) scale(1.08);
+ z-index:20;transform:translate(-50%,-50%) translateZ(150px) rotate(0deg) scale(1.08);
  border-color:#fff;box-shadow:0 30px 65px #000b,0 0 0 1px #ffffff30;
  filter:brightness(1.08) saturate(1)
 }
