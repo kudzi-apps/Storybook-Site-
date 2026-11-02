@@ -36,32 +36,35 @@ document.querySelector(".menu-toggle").addEventListener("click",()=>document.que
 document.querySelectorAll(".topbar nav a").forEach(a=>a.addEventListener("click",()=>document.querySelector(".topbar").classList.remove("menu-open")));
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 if(world&&!reduce){
- let frame=0,travel=0;
+ let frame=0,cameraY=0,lastPointerY=null;
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
- const applyCamera=(x,y)=>{
-  world.style.setProperty("--camera-travel",travel.toFixed(1)+"px");
-  world.style.setProperty("--tilt-y",(x*1.6).toFixed(2)+"deg");
-  world.style.setProperty("--tilt-x","0deg");
+ const applyCamera=()=>{
+  cameraY=clamp(cameraY,-(innerHeight*5.0),innerHeight*.45);
+  world.style.setProperty("--camera-y",cameraY.toFixed(1)+"px");
  };
+ const gallery=document.querySelector(".spatial-gallery");
+ // Wheel and trackpad scroll travel along the photographic floor.
+ gallery?.addEventListener("wheel",e=>{
+  e.preventDefault();
+  cameraY-=e.deltaY*1.65;
+  applyCamera();
+ },{passive:false});
+ // Moving the mouse vertically also advances or retreats the camera.
  if(window.matchMedia("(hover:hover)").matches){
   window.addEventListener("pointermove",e=>{
    if(e.pointerType!=="mouse")return;
+   if(lastPointerY===null){lastPointerY=e.clientY;return;}
+   const delta=e.clientY-lastPointerY;lastPointerY=e.clientY;
    if(frame)cancelAnimationFrame(frame);
    frame=requestAnimationFrame(()=>{
-    const y=e.clientY/innerHeight;
-    // Pointer near the top advances the camera into the distant photographs.
-    travel=clamp((.5-y)*360,-180,180);
-    applyCamera((e.clientX/innerWidth-.5),y);
+    cameraY-=delta*2.4;
+    applyCamera();
    });
   },{passive:true});
-  document.addEventListener("pointerleave",()=>{travel=0;applyCamera(0,.5)});
+  document.addEventListener("pointerleave",()=>{lastPointerY=null});
  }
- const gallery=document.querySelector(".spatial-gallery");
- gallery?.addEventListener("wheel",e=>{
-  e.preventDefault();
-  travel=clamp(travel-e.deltaY*.55,-260,260);
-  applyCamera(0,.5);
- },{passive:false});
+ // Keep the camera bounded when the viewport changes.
+ window.addEventListener("resize",applyCamera,{passive:true});
 }
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
  if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target);}
