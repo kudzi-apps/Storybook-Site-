@@ -35,20 +35,33 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeService();});
 document.querySelector(".menu-toggle").addEventListener("click",()=>document.querySelector(".topbar").classList.toggle("menu-open"));
 document.querySelectorAll(".topbar nav a").forEach(a=>a.addEventListener("click",()=>document.querySelector(".topbar").classList.remove("menu-open")));
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-if(world&&!reduce&&window.matchMedia("(hover:hover)").matches){
- let frame=0;
- window.addEventListener("pointermove",e=>{
-  if(e.pointerType!=="mouse")return;
-  if(frame)cancelAnimationFrame(frame);
-  frame=requestAnimationFrame(()=>{
-   const x=(e.clientX/innerWidth-.5),y=(e.clientY/innerHeight-.5);
-   world.style.setProperty("--tilt-y",(x*3.2).toFixed(2)+"deg");
-   world.style.setProperty("--tilt-x",(-y*2.2).toFixed(2)+"deg");
-  });
- },{passive:true});
- world.addEventListener("pointerleave",()=>{
-  world.style.setProperty("--tilt-x","0deg");world.style.setProperty("--tilt-y","0deg");
- });
+if(world&&!reduce){
+ let frame=0,travel=0;
+ const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+ const applyCamera=(x,y)=>{
+  world.style.setProperty("--camera-travel",travel.toFixed(1)+"px");
+  world.style.setProperty("--tilt-y",(x*1.6).toFixed(2)+"deg");
+  world.style.setProperty("--tilt-x","0deg");
+ };
+ if(window.matchMedia("(hover:hover)").matches){
+  window.addEventListener("pointermove",e=>{
+   if(e.pointerType!=="mouse")return;
+   if(frame)cancelAnimationFrame(frame);
+   frame=requestAnimationFrame(()=>{
+    const y=e.clientY/innerHeight;
+    // Pointer near the top advances the camera into the distant photographs.
+    travel=clamp((.5-y)*360,-180,180);
+    applyCamera((e.clientX/innerWidth-.5),y);
+   });
+  },{passive:true});
+  document.addEventListener("pointerleave",()=>{travel=0;applyCamera(0,.5)});
+ }
+ const gallery=document.querySelector(".spatial-gallery");
+ gallery?.addEventListener("wheel",e=>{
+  e.preventDefault();
+  travel=clamp(travel-e.deltaY*.55,-260,260);
+  applyCamera(0,.5);
+ },{passive:false});
 }
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
  if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target);}
