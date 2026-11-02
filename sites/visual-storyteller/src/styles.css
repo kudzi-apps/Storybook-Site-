@@ -524,3 +524,21 @@ footer{position:fixed!important;left:0!important;right:0!important;bottom:0!impo
   }
   .topbar{position:fixed!important;top:8px!important;left:10px!important;right:10px!important;z-index:100!important}
 }
+
+
+/* Mobile: override inline desktop coordinates so every print stays inside the viewport */
+@media(max-width:650px){
+  .spatial-tile{--x:0%!important;--w:42%!important;--r:0deg!important}
+  .tile-digital{--x:-24%!important;--top:23%!important;--r:-2deg!important}
+  .tile-work{--x:24%!important;--top:23%!important;--r:2deg!important}
+  .tile-photo{--x:-24%!important;--top:41%!important;--r:-2deg!important}
+  .tile-film{--x:24%!important;--top:41%!important;--r:2deg!important}
+  .tile-story{--x:-24%!important;--top:59%!important;--r:2deg!important}
+  .tile-drone{--x:24%!important;--top:59%!important;--r:-2deg!important}
+  .tile-portrait{--x:-24%!important;--top:77%!important;--r:-2deg!important}
+  .tile-events{--x:24%!important;--top:77%!important;--r:2deg!important}
+  .spatial-tile{aspect-ratio:1.42!important;padding:4px!important}
+  .spatial-tile:hover,.spatial-tile:focus-visible,.spatial-tile.is-selected{
+    transform:translate(-50%,-50%) scale(1.025)!important;
+  }
+}
