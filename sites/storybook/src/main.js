@@ -30,7 +30,7 @@ else if(kind==="venue")body='<section class="modal-panel"><button class="modal-c
 else body='<section class="modal-panel gallery-panel"><button class="modal-close" aria-label="Close">×</button><small class="eyebrow">THE WEDDING COLLECTION</small><h2>Moments to <em>keep.</em></h2><div class="gallery-grid">'+[photos.gallery1,photos.couple,photos.gallery2,photos.gallery3,photos.venue].map((src,i)=>'<img src="'+src+'" alt="Wedding photograph '+(i+1)+'" loading="lazy">').join("")+'</div></section>';
 modal.innerHTML='<div class="modal-backdrop"></div>'+body;modal.classList.remove("hidden");
 modal.querySelector(".modal-close").onclick=closeModal;modal.querySelector(".modal-backdrop").onclick=closeModal;
-const form=$("#rsvp-form");if(form)form.onsubmit=e=>{e.preventDefault();const data=new FormData(form),name=String(data.get("name")||"").trim(),attendance=data.get("attendance");try{localStorage.setItem("storybook-rsvp-preview",JSON.stringify({name,email:data.get("email"),attendance}));}catch(_){}if(attendance==="yes"){accepted=true;setPage(0);}closeModal();};
+const form=$("#rsvp-form");if(form)form.onsubmit=e=>{e.preventDefault();const data=new FormData(form),name=String(data.get("name")||"").trim(),attendance=data.get("attendance");try{localStorage.setItem("storybook-rsvp-preview",JSON.stringify({attendance}));}catch(_){}if(attendance==="yes"){accepted=true;setPage(0);}closeModal();};
 modal.querySelector(".modal-close").focus();
 }
 function closeModal(){$("#modal").classList.add("hidden");$("#modal").innerHTML="";if(modalReturnFocus?.focus)modalReturnFocus.focus();}
