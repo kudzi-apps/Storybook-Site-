@@ -44,3 +44,23 @@ $("#stage").addEventListener("touchend",e=>{if(touchX===null)return;const dx=e.c
 try{const saved=JSON.parse(localStorage.getItem("storybook-rsvp-preview")||"null");accepted=!!(saved&&saved.attendance==="yes");}catch(_){}
 function countdown(){const target=new Date("2026-11-05T14:00:00+02:00").getTime(),diff=Math.max(0,target-Date.now()),d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);$("#cd-days").textContent=String(d).padStart(2,"0");$("#cd-hours").textContent=String(h).padStart(2,"0");$("#cd-minutes").textContent=String(m).padStart(2,"0");$("#cd-seconds").textContent=String(s).padStart(2,"0");}
 render();countdown();setInterval(countdown,1000);
+
+
+// Restrained background-only parallax; the cards and glass bars remain fixed.
+const root=document.documentElement;
+let parallaxFrame=0;
+function moveBackdrop(x,y){
+ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ if(parallaxFrame)cancelAnimationFrame(parallaxFrame);
+ parallaxFrame=requestAnimationFrame(()=>{
+  const dx=(x/window.innerWidth-.5)*-14,dy=(y/window.innerHeight-.5)*-10;
+  root.style.setProperty('--bg-x',dx.toFixed(1)+'px');
+  root.style.setProperty('--bg-y',dy.toFixed(1)+'px');
+ });
+}
+window.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')moveBackdrop(e.clientX,e.clientY);},{passive:true});
+window.addEventListener('deviceorientation',e=>{
+ if(e.gamma==null||e.beta==null)return;
+ const dx=Math.max(-1,Math.min(1,e.gamma/35))*7,dy=Math.max(-1,Math.min(1,(e.beta-45)/45))*6;
+ root.style.setProperty('--bg-x',dx.toFixed(1)+'px');root.style.setProperty('--bg-y',dy.toFixed(1)+'px');
+},{passive:true});
