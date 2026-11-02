@@ -38,7 +38,7 @@ $("#nav").querySelectorAll("button").forEach((b,i)=>b.onclick=()=>setPage(i));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#modal").classList.contains("hidden"))closeModal();});
 let touchX=null;$("#stage").addEventListener("touchstart",e=>touchX=e.touches[0].clientX,{passive:true});
 $("#stage").addEventListener("touchend",e=>{if(touchX===null)return;const dx=e.changedTouches[0].clientX-touchX;if(Math.abs(dx)>55)setPage(current+(dx<0?1:-1));touchX=null;},{passive:true});
-try{const saved=JSON.parse(localStorage.getItem("storybook-rsvp-preview")||"null");accepted=!!(saved&&saved.attendance==="yes");}catch(_){}
+try{const saved=JSON.parse(localStorage.getItem("storybook-rsvp-preview")||"null");accepted=!!(saved&&saved.attendance==="yes");if(saved&&typeof saved==="object"&&("name" in saved||"email" in saved))localStorage.setItem("storybook-rsvp-preview",JSON.stringify({attendance:saved.attendance}));}catch(_){}
 function countdown(){const target=new Date("2026-11-05T14:00:00+02:00").getTime(),diff=Math.max(0,target-Date.now()),d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);$("#cd-days").textContent=String(d).padStart(2,"0");$("#cd-hours").textContent=String(h).padStart(2,"0");$("#cd-minutes").textContent=String(m).padStart(2,"0");$("#cd-seconds").textContent=String(s).padStart(2,"0");}
 render();countdown();setInterval(countdown,1000);
 
