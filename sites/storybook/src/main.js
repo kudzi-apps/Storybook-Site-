@@ -15,15 +15,12 @@ gallery:{title:"Moments to keep",kicker:"THE WEDDING COLLECTION",description:"A 
 };
 let current=0,accepted=false,modalReturnFocus=null;
 const activeKey=()=>current===0&&accepted?"home":pages[current];
+const icons={rsvp:'<svg class="card-icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/></svg>',home:'<svg class="card-icon" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/></svg>',venue:'<svg class="card-icon" viewBox="0 0 24 24"><path d="M12 22s8-7.2 8-13a8 8 0 1 0-16 0c0 5.8 8 13 8 13Z"/><circle cx="12" cy="9" r="2.5"/></svg>',gallery:'<svg class="card-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>'};
 function render(){
-const order=[(current+2)%3,current,(current+1)%3];
-$("#nav").querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("active",i===current);if(i===0)b.textContent=accepted?"Home":"RSVP";b.setAttribute("aria-current",i===current?"page":"false");});
-$("#stage").innerHTML='<div class="carousel" aria-label="Storybook pages">'+order.map((idx,pos)=>{
-const key=idx===0&&accepted?"home":pages[idx],item=details[key];
-return '<button class="story-card '+(pos===1?"is-active":"is-side")+'" data-page="'+idx+'" aria-label="Open '+(key==="rsvp"?"RSVP":key)+'"><img src="'+item.image+'" alt="" loading="eager"><span class="card-shade"></span><span class="card-content"><small>'+item.kicker+'</small><strong>'+item.title+'</strong><span class="card-description">'+item.description+'</span><span class="card-action">'+item.action+' ↗</span></span></button>';
-}).join("")+'</div><div class="pagination">'+pages.map((p,i)=>'<button data-dot="'+i+'" class="'+(i===current?"active":"")+'" aria-label="Go to '+(i===0?(accepted?"Home":"RSVP"):p)+'"></button>').join("")+'</div>';
+const order=[(current+2)%3,current,(current+1)%3],labels=accepted?["Home","Venue","Gallery"]:["RSVP","Venue","Gallery"];
+$("#nav").querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("active",i===current);b.innerHTML=icons[i===0?(accepted?"home":"rsvp"):pages[i]]+"<span>"+labels[i]+"</span>";b.setAttribute("aria-current",i===current?"page":"false");});
+$("#stage").innerHTML='<div class="carousel" aria-label="Storybook pages">'+order.map((idx,pos)=>{const key=idx===0&&accepted?"home":pages[idx],item=details[key];return '<button class="story-card '+(pos===1?"is-active":"is-side")+'" data-page="'+idx+'" aria-label="Open '+labels[idx]+'"><img src="'+item.image+'" alt="" loading="eager"><span class="card-shade"></span><span class="card-content">'+icons[key]+'<strong>'+labels[idx]+'</strong></span></button>';}).join("")+'</div>';
 $("#stage").querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{const index=Number(b.dataset.page);if(index!==current){setPage(index);return;}const key=activeKey();openModal(key==="home"?"rsvp":key);});
-$("#stage").querySelectorAll("[data-dot]").forEach(b=>b.onclick=()=>setPage(Number(b.dataset.dot)));
 }
 function setPage(i){current=(i+3)%3;render();}
 function openModal(kind){
