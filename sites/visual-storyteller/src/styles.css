@@ -194,3 +194,4 @@ footer{
 @media(prefers-reduced-motion:reduce){
  .spatial-tile,.spatial-tile img,.tile-copy i{transition:none!important}
 }
+.spatial-world{transition:transform .35s ease-out;transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg))}@media(max-width:650px){.spatial-world{transform:none!important}}
