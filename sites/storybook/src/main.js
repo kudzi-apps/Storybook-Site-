@@ -1,3 +1,134 @@
-const pages=["rsvp","venue","gallery"];let current=0,detail=null,accepted=false,guestName="";const $=s=>document.querySelector(s);const photos={couple:"https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1600&q=90",venue:"https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=900&q=80",ceremony:"https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80",flowers:"https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=80",guest1:"https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=800&q=80",guest2:"https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80",guest3:"https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=800&q=80"};const content={home:{title:"A little piece of",sub:"A place for the people, places and moments that make this day ours.",cards:[{title:"The invitation",desc:"Alexandra & James · Saturday, 14 November 2026",image:photos.couple,kind:"invite"},{title:"Your RSVP",desc:"Let us know if you can make it.",kind:"rsvp"},{title:"Your gatepass",desc:"Your personal arrival pass will appear here after approval.",kind:"pass"}]},venue:{title:"Meet us",sub:"The place where the day unfolds.",cards:[{title:"The venue",desc:"The Olive Grove · Harare",image:photos.venue,kind:"venue"},{title:"Getting here",desc:"Directions, parking and arrival guidance.",kind:"directions"},{title:"Arrival & access",desc:"Your gatepass and check-in details.",kind:"arrival"}]},programme:{title:"The day, in moments",sub:"A gentle guide to what happens and when.",cards:[{title:"Full programme",desc:"The complete order of the day.",kind:"timeline"},{title:"Ceremony",desc:"The moment it all begins.",image:photos.ceremony,kind:"ceremony"},{title:"My schedule",desc:"Your personal responsibilities and reminders.",kind:"personal"}]},gallery:{title:"Held in memory",sub:"Two collections, one shared celebration.",cards:[]},rsvp:{title:"Your invitation",sub:"Let us know if you can celebrate with us.",cards:[]}};function setPage(i){current=(i+pages.length)%pages.length;detail=null;render()}function render(){let key=current===0?(accepted?"home":"rsvp"):pages[current],d=content[key];document.querySelector(".intro").classList.toggle("is-home",key==="home");$("#nav").querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("active",i===current);if(i===0)b.textContent=accepted?"Home":"RSVP";});$("#page-title").innerHTML=d.title+(key==="home"?" <em>forever.</em>":"");$("#page-subtitle").textContent=d.sub;$("#page-count").textContent=String(current+1).padStart(2,"0")+" / 03";if(key==="gallery"){ $("#stage").innerHTML=galleryMarkup();wireGallery();return;}if(key==="home"){ $("#stage").innerHTML='<section class="home-hero"><img src="'+photos.couple+'" alt="A couple sharing a quiet moment"><div class="hero-shade"></div><div class="home-copy"><small>THE STORY OF A DAY, AND THE PEOPLE IN IT</small><h2>A little story.<br><em>A lifetime of love.</em></h2><p>Join us as we make a memory worth keeping.</p><div class="countdown" id="countdown"><span><b id="cd-days">00</b><small>DAYS</small></span><i>:</i><span><b id="cd-hours">00</b><small>HOURS</small></span><i>:</i><span><b id="cd-mins">00</b><small>MINUTES</small></span><i>:</i><span><b id="cd-secs">00</b><small>SECONDS</small></span></div><button class="primary" id="home-rsvp">RSVP / YOUR INVITATION ↗</button></div><div class="hero-caption">ALEXANDRA & JAMES <span>·</span> 05 NOVEMBER 2026</div></section>';$("#home-rsvp").onclick=()=>setPage(4);return;}if(key==="rsvp"){ $("#stage").innerHTML='<section class="rsvp-page"><div class="rsvp-art"><img src="'+photos.couple+'" alt="The couple"></div><div class="rsvp-copy"><small>YOUR INVITATION</small><h2>Will you be<br><em>there with us?</em></h2><p>We would love to celebrate together. Let us know if you can make it.</p><button class="primary" id="rsvp-open">OPEN RSVP ↗</button></div></section>';$("#rsvp-open").onclick=()=>openDetail("rsvp");return;}$("#stage").innerHTML='<div class="card-track">'+d.cards.map((c,i)=>'<button class="story-card '+(i===0?"featured":"")+'" data-card="'+c.kind+'" style="--i:'+i+'">'+(c.image?'<img src="'+c.image+'" alt="">':'<div class="card-art '+c.kind+'"><span>'+({rsvp:"RSVP",pass:"ACCESS",directions:"DIRECTIONS",arrival:"ARRIVAL",timeline:"THE DAY",personal:"YOUR ROLE",venue:"THE OLIVE GROVE",ceremony:"THE CEREMONY"}[c.kind]||"STORY")+'</span></div>')+'<div class="card-copy"><small>0'+(i+1)+' / '+key.toUpperCase()+'</small><h2>'+c.title+'</h2><p>'+c.desc+'</p><span class="open-card">Explore ↗</span></div></button>').join("")+'</div><div id="detail" class="detail hidden"></div>';$("#stage").querySelectorAll(".story-card").forEach(b=>b.onclick=()=>openDetail(b.dataset.card));}function galleryMarkup(){let official=[photos.couple,photos.venue,photos.ceremony,photos.flowers,photos.guest2],guest=[photos.guest1,photos.guest3,photos.guest2,photos.flowers,photos.guest1];return '<div class="gallery-streams"><section class="stream"><div class="stream-head"><div><small>THE OFFICIAL COLLECTION</small><h2>Wedding photographs</h2></div><span>01 — 05</span></div><div class="stream-row">'+official.map((p,i)=>'<button class="gallery-photo" data-src="'+p+'"><img src="'+p+'" alt="Official wedding photograph '+(i+1)+'"></button>').join("")+'</div></section><section class="stream"><div class="stream-head"><div><small>FROM YOUR PEOPLE</small><h2>Guest moments</h2></div><span>01 — 05</span></div><div class="stream-row">'+guest.map((p,i)=>'<button class="gallery-photo" data-src="'+p+'"><img src="'+p+'" alt="Guest moment '+(i+1)+'"></button>').join("")+'</div></section></div>'}function wireGallery(){$("#stage").querySelectorAll(".gallery-photo").forEach(b=>b.onclick=()=>{let m=$("#modal");m.classList.remove("hidden");m.innerHTML='<button class="modal-close">×</button><img class="lightbox-img" src="'+b.dataset.src+'" alt="Selected gallery photograph">';m.querySelector("button").onclick=()=>m.classList.add("hidden")})}function openDetail(kind){detail=kind;let d=$("#detail");d.classList.remove("hidden");let html={invite:'<div class="detail-hero"><img src="'+photos.couple+'" alt="The couple"><div><small>THE INVITATION</small><h2>Alexandra <em>&</em> James</h2><p>Saturday, 14 November 2026 · 14:00</p><button class="primary" id="accept">Accept invitation</button><button class="text-btn" id="decline">I cannot attend</button></div></div>',rsvp:'<small>YOUR RESPONSE</small><h2>Will you join us?</h2><form id="rsvp" class="form"><label>Full name<input required name="name" placeholder="Your full name"></label><label>Email address<input required type="email" name="email" placeholder="you@example.com"></label><label>WhatsApp number<input name="phone" placeholder="+263"></label><label>Attendance<select name="attendance"><option>Joyfully accepts</option><option>Regretfully declines</option></select></label><label>Accompanying guests<select name="plus"><option>Just me</option><option>One guest</option></select></label><label>Dietary requirements<textarea name="diet" placeholder="Anything we should know?"></textarea></label><button class="primary">Save RSVP</button></form><p class="micro">This is a preview. Responses are not sent to an organiser.</p>',pass:'<small>YOUR PERSONAL ACCESS</small><h2>Gatepass</h2><div class="pass-box"><div class="qr-faux"></div><p>Guest access preview</p><strong>SB · ALEXJAMES · 014</strong></div><p>Your live gatepass will be issued after organiser approval.</p>',venue:'<img class="detail-photo" src="'+photos.venue+'" alt="Wedding venue"><small>THE OLIVE GROVE · HARARE</small><h2>A place to gather.</h2><p>Set among leafy gardens, The Olive Grove is where we will celebrate together.</p><button class="secondary">Open directions ↗</button>',directions:'<small>GETTING HERE</small><h2>Find your way.</h2><div class="map-placeholder">THE OLIVE GROVE<br><span>HARARE · ZIMBABWE</span></div><p>Parking is available at the venue. Please arrive 20 minutes before the ceremony.</p>',arrival:'<small>ARRIVAL & ACCESS</small><h2>On the day.</h2><p>Have your personal gatepass ready at the entrance. The team will scan it on arrival.</p>',timeline:'<small>SATURDAY · 14 NOVEMBER</small><h2>The programme</h2><div class="timeline"><p><b>13:30</b> Guest arrival</p><p><b>14:00</b> Ceremony</p><p><b>15:00</b> Drinks & photographs</p><p><b>17:00</b> Reception</p><p><b>19:00</b> Dinner & speeches</p><p><b>21:00</b> Dance floor</p></div>',ceremony:'<img class="detail-photo" src="'+photos.ceremony+'" alt="Wedding ceremony"><small>14:00 · THE GARDEN</small><h2>The ceremony.</h2><p>Please be seated 10 minutes before the ceremony begins.</p>',personal:'<small>YOUR PERSONAL SCHEDULE</small><h2>Your part in the day.</h2><p>No special role has been assigned to this guest preview. If the couple assigns you a role, your instructions and timings will appear here.</p>'}[kind]||"<h2>More details soon.</h2>";d.innerHTML='<button class="back-detail" id="back">← Back to '+pages[current]+'</button><div class="detail-inner">'+html+'</div>';$("#back").onclick=()=>{d.classList.add("hidden");detail=null};if($("#accept"))$("#accept").onclick=()=>openDetail("rsvp");if($("#decline"))$("#decline").onclick=()=>{if(confirm("Are you sure you want to decline this invitation?"))alert("Decline recorded in this local preview only.")};if($("#rsvp"))$("#rsvp").onsubmit=e=>{e.preventDefault();guestName=new FormData(e.target).get("name");accepted=true;alert("Thank you, "+guestName+". Your RSVP is saved in this preview only.");d.classList.add("hidden");setPage(0)}}$("#nav").querySelectorAll("button").forEach((b,i)=>b.onclick=()=>setPage(i));$("#prev").onclick=()=>setPage(current-1);$("#next").onclick=()=>setPage(current+1);let x0=0;$("#stage").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});$("#stage").addEventListener("touchend",e=>{let dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>80&&!detail)setPage(current+(dx<0?1:-1))},{passive:true});$("#demo-toggle").onclick=()=>{let k=$("#status-kicker"),m=$("#status-main");if(k.textContent==="COUNTING DOWN"){k.textContent="HAPPENING NOW";m.textContent="The ceremony is underway";$("#ticker").textContent="Next · Drinks & photographs · 15:00 · Reception · 17:00 · "}else if(k.textContent==="HAPPENING NOW"){k.textContent="AFTER THE DAY";m.textContent="Thank you for being part of it";$("#ticker").textContent="Alex & James: Thank you for celebrating with us · What a beautiful day · "}else{k.textContent="COUNTING DOWN";m.textContent="14 days to go";$("#ticker").textContent="We cannot wait to celebrate with you · Save the date · "}};render();
-function updateCountdown(){const target=new Date("2026-11-05T14:00:00+02:00").getTime();let diff=Math.max(0,target-Date.now());const d=Math.floor(diff/86400000);diff%=86400000;const h=Math.floor(diff/3600000);diff%=3600000;const m=Math.floor(diff/60000);const s=Math.floor((diff%60000)/1000);const put=(id,n)=>{const el=document.getElementById(id);if(el)el.textContent=String(n).padStart(2,"0")};put("cd-days",d);put("cd-hours",h);put("cd-mins",m);put("cd-secs",s)}updateCountdown();setInterval(updateCountdown,1000);
-\n$("#happening-now").onclick=()=>{const k=$("#status-kicker"),m=$("#status-main");k.textContent="HAPPENING NOW";m.textContent="The celebration is underway";$("#ticker").textContent="Today, together · Ceremony · Celebration · Dinner · Dancing · ";setPage(2);};\n
+const $ = (s) => document.querySelector(s);
+const photos = {
+  couple: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1600&q=90",
+  venue: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=85",
+  gallery1: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1000&q=85",
+  gallery2: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1000&q=85",
+  gallery3: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1000&q=85"
+};
+const pages = ["rsvp", "venue", "gallery"];
+const pageInfo = {
+  rsvp: { title: "Your invitation", kicker: "A PLACE AT OUR TABLE", description: "Be part of the day. Let us know if you'll be joining us.", image: photos.couple, action: "Open your invitation" },
+  home: { title: "Our little forever", kicker: "THE WEDDING OF ALEXANDRA & JAMES", description: "A day made more beautiful because we'll share it with you.", image: photos.couple, action: "View the invitation" },
+  venue: { title: "The Olive Grove", kicker: "HARARE · ZIMBABWE", description: "A garden setting for a day filled with love, laughter and the people who matter.", image: photos.venue, action: "Explore the venue" },
+  gallery: { title: "Moments to keep", kicker: "THE WEDDING COLLECTION", description: "A growing collection of the little moments that make the day ours.", image: photos.gallery1, action: "Open the gallery" }
+};
+let current = 0;
+let accepted = false;
+let eventLive = false;
+let modalReturnFocus = null;
+const activeKey = () => current === 0 && accepted ? "home" : pages[current];
+function setPage(index) {
+  current = (index + pages.length) % pages.length;
+  render();
+}
+function render() {
+  const key = activeKey();
+  const order = [(current + 2) % 3, current, (current + 1) % 3];
+  $("#nav").querySelectorAll("button").forEach((button, i) => {
+    button.classList.toggle("active", i === current);
+    if (i === 0) button.textContent = accepted ? "Home" : "RSVP";
+    button.setAttribute("aria-current", i === current ? "page" : "false");
+  });
+  $("#page-title").innerHTML = key === "home" ? 'A little piece of <em>forever.</em>' : key === "rsvp" ? 'A day to <em>remember.</em>' : key === "venue" ? 'Meet us <em>there.</em>' : 'Held in <em>memory.</em>';
+  $("#page-subtitle").textContent = key === "home" ? "A place for the people, places and moments that make this day ours." : "A celebration of love, friendship and everything in between.";
+  $("#stage").innerHTML = '<div class="carousel" aria-label="Storybook pages">' + order.map((index, position) => {
+    const cardKey = index === 0 && accepted ? "home" : pages[index];
+    const item = pageInfo[cardKey];
+    const selected = position === 1;
+    return '<button class="story-card ' + (selected ? "is-active" : "is-side") + '" data-page="' + index + '" aria-label="Open ' + (cardKey === "rsvp" ? "RSVP" : cardKey) + '">' +
+      '<img src="' + item.image + '" alt="" loading="eager"><span class="card-shade"></span>' +
+      '<span class="card-content"><small>' + item.kicker + '</small><strong>' + item.title + '</strong><span class="card-description">' + item.description + '</span><span class="card-action">' + item.action + ' ↗</span></span></button>';
+  }).join("") + '</div><div class="pagination" aria-label="Page ' + (current + 1) + ' of 3">' + pages.map((p, i) => '<button data-dot="' + i + '" class="' + (i === current ? "active" : "") + '" aria-label="Go to ' + (i === 0 ? (accepted ? "Home" : "RSVP") : p) + '"></button>').join("") + '</div>';
+  $("#stage").querySelectorAll("[data-page]").forEach(button => button.addEventListener("click", () => setPage(Number(button.dataset.page))));
+  $("#stage").querySelectorAll("[data-dot]").forEach(button => button.addEventListener("click", () => setPage(Number(button.dataset.dot))));
+  $("#page-count").textContent = String(current + 1).padStart(2, "0") + " / 03";
+  $("#prev").disabled = false;
+  $("#next").disabled = false;
+  $("#prev").onclick = () => setPage(current - 1);
+  $("#next").onclick = () => setPage(current + 1);
+  $("#happening-now").classList.toggle("visible", eventLive);
+  updateStatus();
+}
+function openModal(kind) {
+  modalReturnFocus = document.activeElement;
+  const modal = $("#modal");
+  let body = "";
+  if (kind === "rsvp") {
+    body = '<div class="modal-panel rsvp-panel"><button class="modal-close" aria-label="Close">×</button><small class="eyebrow">YOUR INVITATION</small><h2>Will you be <em>there with us?</em></h2><p>We would love to celebrate together. Let us know if you can make it.</p><form id="rsvp-form"><label>Full name<input name="name" required autocomplete="name" placeholder="Your full name"></label><label>Email address<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label><label>WhatsApp number <span>(optional)</span><input name="phone" autocomplete="tel" placeholder="+263"></label><label>Will you attend?<select name="attendance"><option value="yes">Joyfully accepts</option><option value="no">Regretfully declines</option></select></label><label>Accompanying guest<select name="plus"><option>Just me</option><option>One guest</option></select></label><label>Dietary requirements<textarea name="diet" rows="2" placeholder="Anything we should know?"></textarea></label><button class="primary" type="submit">Send response ↗</button></form><p class="micro">Demo mode: this response is stored only in this browser preview. No organiser is notified.</p></div>';
+  } else if (kind === "venue") {
+    body = '<div class="modal-panel"><button class="modal-close" aria-label="Close">×</button><img class="modal-photo" src="' + photos.venue + '" alt="Garden wedding venue"><small class="eyebrow">THE OLIVE GROVE · HARARE</small><h2>A place to <em>gather.</em></h2><p>Set among leafy gardens, The Olive Grove is where we will celebrate together. Please aim to arrive 20 minutes before the ceremony.</p><a class="primary link-button" href="https://www.google.com/maps/search/?api=1&query=The+Olive+Grove+Harare" target="_blank" rel="noreferrer">Get directions ↗</a></div>';
+  } else if (kind === "gallery") {
+    const images = [photos.gallery1, photos.couple, photos.gallery2, photos.gallery3, photos.venue];
+    body = '<div class="modal-panel gallery-panel"><button class="modal-close" aria-label="Close">×</button><small class="eyebrow">THE WEDDING COLLECTION</small><h2>Moments to <em>keep.</em></h2><p>A few glimpses of the celebration.</p><div class="gallery-grid">' + images.map((src, i) => '<img src="' + src + '" alt="Wedding gallery photograph ' + (i + 1) + '" loading="lazy">').join("") + '</div></div>';
+  } else {
+    body = '<div class="modal-panel"><button class="modal-close" aria-label="Close">×</button><small class="eyebrow">THE WEDDING OF ALEXANDRA & JAMES</small><h2>A little story.<br><em>A lifetime of love.</em></h2><p>Saturday, 5 November 2026 · 14:00 · The Olive Grove, Harare.</p><button class="primary" id="home-rsvp">RSVP / YOUR INVITATION ↗</button></div>';
+  }
+  modal.innerHTML = '<div class="modal-backdrop"></div>' + body;
+  modal.classList.remove("hidden");
+  modal.querySelector(".modal-close").onclick = closeModal;
+  modal.querySelector(".modal-backdrop").onclick = closeModal;
+  const form = $("#rsvp-form");
+  if (form) form.onsubmit = event => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    if (data.get("attendance") === "yes") {
+      accepted = true;
+      localStorage.setItem("storybook-rsvp-preview", JSON.stringify({ name, email: data.get("email"), attendance: "yes" }));
+      closeModal();
+      setPage(0);
+      $("#page-subtitle").textContent = "Thank you, " + name + ". We're looking forward to celebrating with you.";
+    } else {
+      localStorage.setItem("storybook-rsvp-preview", JSON.stringify({ name, email: data.get("email"), attendance: "no" }));
+      closeModal();
+      alert("Thank you for letting us know, " + name + ".");
+    }
+  };
+  const homeRsvp = $("#home-rsvp");
+  if (homeRsvp) homeRsvp.onclick = () => openModal("rsvp");
+  modal.querySelector(".modal-close").focus();
+}
+function closeModal() {
+  $("#modal").classList.add("hidden");
+  $("#modal").innerHTML = "";
+  if (modalReturnFocus && modalReturnFocus.focus) modalReturnFocus.focus();
+}
+function updateStatus() {
+  const kicker = $("#status-kicker");
+  const main = $("#status-main");
+  if (eventLive) {
+    kicker.textContent = "HAPPENING NOW";
+    main.textContent = "The celebration is underway";
+    $("#ticker").textContent = "Today, together · Ceremony · Celebration · Dinner · Dancing · ";
+    return;
+  }
+  const target = new Date("2026-11-05T14:00:00+02:00").getTime();
+  const remaining = Math.max(0, target - Date.now());
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  kicker.textContent = "COUNTING DOWN";
+  main.textContent = days + " days · " + String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+  $("#ticker").textContent = "We cannot wait to celebrate with you · Alexandra & James · 5 November 2026 · ";
+}
+$("#nav").querySelectorAll("button").forEach((button, index) => button.addEventListener("click", () => setPage(index)));
+$("#demo-toggle").addEventListener("click", () => { eventLive = !eventLive; updateStatus(); $("#happening-now").classList.toggle("visible", eventLive); });
+$("#happening-now").addEventListener("click", () => { eventLive = !eventLive; updateStatus(); $("#happening-now").classList.toggle("visible", eventLive); });
+document.addEventListener("keydown", event => { if (event.key === "Escape" && !$("#modal").classList.contains("hidden")) closeModal(); });
+let touchStart = null;
+$("#stage").addEventListener("touchstart", event => { touchStart = event.touches[0].clientX; }, { passive: true });
+$("#stage").addEventListener("touchend", event => {
+  if (touchStart === null || !$("#modal").classList.contains("hidden")) return;
+  const delta = event.changedTouches[0].clientX - touchStart;
+  if (Math.abs(delta) > 55) setPage(current + (delta < 0 ? 1 : -1));
+  touchStart = null;
+}, { passive: true });
+try {
+  const saved = JSON.parse(localStorage.getItem("storybook-rsvp-preview") || "null");
+  accepted = !!(saved && saved.attendance === "yes");
+} catch (_) {}
+render();
+updateStatus();
+setInterval(updateStatus, 1000);
