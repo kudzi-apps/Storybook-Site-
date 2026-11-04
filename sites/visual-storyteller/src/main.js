@@ -72,7 +72,10 @@ async function renderPortfolio(category){
 }
 function escapePortfolio(value){return String(value||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function renderPortfolioDetail(project,category){
- content.innerHTML='<button class="portfolio-back" id="portfolio-back">← All '+category+' projects</button>'+(project.cover_key?'<img class="portfolio-detail-image" src="https://visual-story-teller-media-api.kudzaimagigi99.workers.dev/api/public/media/'+encodeURIComponent(project.cover_key)+'" alt="'+escapePortfolio(project.title)+'">':'')+'<div class="portfolio-detail-copy"><span class="eyebrow">'+escapePortfolio(category)+'</span><h2>'+escapePortfolio(project.title)+'</h2><p>'+escapePortfolio(project.description||"")+'</p><small>'+escapePortfolio(project.location||"")+'</small></div>';
+ const apiBase="https://visual-storyteller-media-api.kudzaimagigi99.workers.dev";
+ const gallery=(project.media||[]).map(item=>{const src=apiBase+item.url;return item.media_type==="video"?'<video class="portfolio-detail-image" controls playsinline preload="metadata" src="'+src+'"></video>':'<img class="portfolio-detail-image" loading="lazy" src="'+src+'" alt="'+escapePortfolio(item.alt_text||project.title)+'">';}).join("");
+ const cover=project.cover_key?'<img class="portfolio-detail-image" src="'+apiBase+'/api/public/media/'+project.cover_key.split("/").map(encodeURIComponent).join("/")+'" alt="'+escapePortfolio(project.title)+'">':"";
+ content.innerHTML='<button class="portfolio-back" id="portfolio-back">← All '+category+' projects</button><div class="portfolio-detail-copy"><span class="eyebrow">'+escapePortfolio(category)+'</span><h2>'+escapePortfolio(project.title)+'</h2><p>'+escapePortfolio(project.description||"")+'</p><small>'+escapePortfolio(project.location||"")+'</small></div><div class="portfolio-detail-gallery">'+(gallery||cover)+'</div>';
  $("#portfolio-back").onclick=()=>renderPortfolio(category);
 }
 function renderService(name){
