@@ -673,4 +673,4 @@ body.panel-open{overflow:hidden}
 .terms-accept span{font-size:11px;line-height:1.6;color:#e5e5e5}
 .terms-accept a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 .submit-options button:disabled{opacity:.38;cursor:not-allowed}
-@media(max-width:650px){.bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}.bottom-nav button{font-size:clamp(8px,2.15vw,11px)!important;padding-left:1px!important;padding-right:1px!important}.terms-actions a{flex:1}}
+@media(max-width:650px){.bottom-nav{grid-template-columns:repeat(4,minmax(0,1fr))!important}.bottom-nav button{font-size:clamp(9px,2.5vw,11px)!important;padding-left:1px!important;padding-right:1px!important}.bottom-nav .nav-quote{font-size:clamp(13px,3.4vw,16px)!important}.terms-actions a{flex:1}}
