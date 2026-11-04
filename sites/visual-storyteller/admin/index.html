@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0c0e">
+<title>Site Studio — Visual Storyteller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./studio.css">
+</head>
+<body>
+<div class="studio-shell">
+<aside class="sidebar">
+<a class="brand" href="../" aria-label="Open public website"><span class="brand-mark">VS</span><span><b>VISUAL STORYTELLER</b><small>SITE STUDIO</small></span></a>
+<div class="side-label">WORKSPACE</div>
+<nav class="side-nav" aria-label="Studio sections">
+<button class="nav-item active" data-view="overview"><span>⌂</span> Overview</button>
+<button class="nav-item" data-view="projects"><span>▦</span> Projects</button>
+<button class="nav-item" data-view="media"><span>▧</span> Media library</button>
+<button class="nav-item" data-view="appearance"><span>◐</span> Appearance</button>
+<button class="nav-item" data-view="layout"><span>▤</span> Layout & navigation</button>
+<button class="nav-item" data-view="publishing"><span>↗</span> Publishing</button>
+</nav>
+<div class="sidebar-bottom"><span class="status-dot"></span><span>Site connection pending</span><a href="../" target="_blank" rel="noreferrer">View website ↗</a></div>
+</aside>
+<main class="main">
+<header class="topbar"><div><span class="crumb">WORKSPACE</span><strong id="page-heading">Overview</strong></div><div class="top-actions"><span class="draft-state">LOCAL PREVIEW</span><button class="button quiet" id="preview-button">Preview site ↗</button></div></header>
+<div class="notice"><b>Setup stage</b><span>The dashboard interface is in place. Secure sign-in, database, media storage and publishing will activate after Cloudflare resources are configured. Nothing here is published yet.</span></div>
+<section class="view active" id="view-overview">
+<div class="welcome"><div><span class="eyebrow">YOUR CREATIVE CONTROL ROOM</span><h1>Make the site<br><em>look like your work.</em></h1><p>Manage projects, media and the visual language of Visual Storyteller from one place.</p></div><div class="welcome-art"><div class="art-card card-one"></div><div class="art-card card-two"></div><div class="art-card card-three"></div><span>VS / STUDIO</span></div></div>
+<div class="section-heading"><div><span class="eyebrow">SITE CONTENT</span><h2>Workspace</h2></div><span class="muted">Your first controls</span></div>
+<div class="overview-grid">
+<button class="feature-card" data-open="projects"><span class="feature-icon">▦</span><b>Projects</b><small>Create shoots, films and Storybook showcases. Arrange the portfolio as a masonry gallery.</small><span class="card-link">Manage projects ↗</span></button>
+<button class="feature-card" data-open="media"><span class="feature-icon">▧</span><b>Media library</b><small>Keep original uploads, web-ready images, video files and project thumbnails organised.</small><span class="card-link">Browse media ↗</span></button>
+<button class="feature-card" data-open="appearance"><span class="feature-icon">◐</span><b>Appearance</b><small>Control colours, typography, backgrounds, panel surfaces and visual details.</small><span class="card-link">Edit appearance ↗</span></button>
+<button class="feature-card" data-open="layout"><span class="feature-icon">▤</span><b>Layout & navigation</b><small>Adjust gallery columns, image proportions, navigation labels and responsive behaviour.</small><span class="card-link">Configure layout ↗</span></button>
+</div>
+<div class="section-heading"><div><span class="eyebrow">PUBLIC WEBSITE</span><h2>Current design system</h2></div></div>
+<div class="design-strip"><div class="swatch dark"><span>Night</span><b>#08090B</b></div><div class="swatch warm"><span>Warm accent</span><b>#F2B4A9</b></div><div class="swatch paper"><span>Soft white</span><b>#F1F1F1</b></div><div class="type-sample"><span>TYPE DIRECTION</span><b>Ubuntu</b><i>Editorial display — Cormorant Garamond</i></div></div>
+</section>
+<section class="view" id="view-projects"><div class="view-heading"><div><span class="eyebrow">PORTFOLIO MANAGEMENT</span><h1>Projects</h1><p>Create a project first, then attach its photographs, films or Storybook preview.</p></div><button class="button primary" disabled>＋ New project</button></div><div class="empty-state"><span>▦</span><h2>Projects will live here</h2><p>Photography, Videography and Storybook projects will be grouped here. Each project can have a cover, media collection, description, category and publication status.</p><small>Waiting for database connection</small></div></section>
+<section class="view" id="view-media"><div class="view-heading"><div><span class="eyebrow">ASSET MANAGEMENT</span><h1>Media library</h1><p>Originals stay separate from optimised website copies.</p></div><button class="button primary" disabled>↑ Upload media</button></div><div class="media-guidance"><div><b>Photographs</b><p>Upload high-quality originals. The site will use responsive web-sized derivatives and thumbnails.</p></div><div><b>Video</b><p>Store video masters separately from lightweight previews and poster frames.</p></div><div><b>Project organisation</b><p>Media can be assigned to projects, reordered and reused where appropriate.</p></div></div><div class="empty-state compact"><span>▧</span><h2>Your media library is not connected yet</h2><p>Cloudflare R2 storage and secure upload permissions are required before files can be added.</p></div></section>
+<section class="view" id="view-appearance"><div class="view-heading"><div><span class="eyebrow">VISUAL IDENTITY</span><h1>Appearance</h1><p>Change the look without editing the website's underlying behaviour.</p></div><span class="pill">Preview controls only</span></div><div class="editor-grid"><div class="editor-card"><h3>Colour palette</h3><label>Background <input type="color" value="#08090b" data-token="--site-bg"></label><label>Text <input type="color" value="#f1f1f1" data-token="--site-text"></label><label>Accent <input type="color" value="#f2b4a9" data-token="--site-accent"></label><label>Panel surface <input type="color" value="#17191c" data-token="--site-panel"></label><p class="helper">These controls demonstrate the intended editor. Changes are local to this browser until the settings API is connected.</p></div><div class="editor-card"><h3>Typography</h3><label>Display font<select disabled><option>Cormorant Garamond</option></select></label><label>Interface font<select disabled><option>Ubuntu</option></select></label><p class="helper">Font selection, scale and weights will be editable in the connected editor.</p></div><div class="editor-card"><h3>Visual surfaces</h3><div class="toggle-row"><span>Glass panels</span><input type="checkbox" checked disabled></div><div class="toggle-row"><span>Soft image corners</span><input type="checkbox" disabled></div><div class="toggle-row"><span>Ambient background</span><input type="checkbox" checked disabled></div><p class="helper">Advanced styling controls will be added after the live preview is connected.</p></div><div class="preview-card" id="style-preview"><span class="eyebrow">LIVE STYLE SAMPLE</span><h2>Stories worth keeping.</h2><p>Photography · Films · Digital experiences</p><span class="preview-chip">VISUAL STORYTELLER</span></div></div></section>
+<section class="view" id="view-layout"><div class="view-heading"><div><span class="eyebrow">SITE COMPOSITION</span><h1>Layout & navigation</h1><p>Shape how projects are discovered across desktop and mobile.</p></div></div><div class="editor-card layout-options"><h3>Portfolio gallery</h3><label>Columns<select id="column-setting"><option>3 columns</option><option>2 columns</option><option>4 columns</option></select></label><label>Arrangement<select><option>Masonry — varied project sizes</option><option>Uniform grid</option></select></label><label>Project order<select><option>Curated order</option><option>Newest first</option><option>Oldest first</option></select></label><label>Panel scroll<select><option>Scroll inside panel</option><option>Full page scroll</option></select></label><p class="helper">Layout settings are illustrative until the site configuration service is connected.</p></div></section>
+<section class="view" id="view-publishing"><div class="view-heading"><div><span class="eyebrow">RELEASE CONTROL</span><h1>Publishing</h1><p>Review changes before they reach the public website.</p></div></div><div class="publish-steps"><div><b>01</b><span><strong>Save draft</strong><small>Keep unpublished edits safely stored.</small></span></div><div><b>02</b><span><strong>Preview</strong><small>Check desktop and mobile presentation.</small></span></div><div><b>03</b><span><strong>Publish</strong><small>Release the approved version to the live site.</small></span></div><div><b>04</b><span><strong>Restore</strong><small>Return to a previous published revision if needed.</small></span></div></div><div class="empty-state compact"><span>↗</span><h2>Publishing is not enabled</h2><p>Authentication, persistent settings and version history must be configured before publishing can be activated.</p></div></section>
+<footer class="footer">VISUAL STORYTELLER / SITE STUDIO <span>ADMIN WORKSPACE · NOT YET CONNECTED</span></footer>
+</main></div><script src="./studio.js" defer></script>
+</body></html>
