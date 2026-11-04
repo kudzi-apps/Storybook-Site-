@@ -136,7 +136,7 @@ document.addEventListener("click",function(event){
 document.addEventListener("keydown",function(event){if(event.key==="Escape"&&panel.classList.contains("open"))closePanel();});
 const world=document.querySelector("#spatial-world");
 if(world){
- const sourceTiles=Array.from(document.querySelectorAll(".spatial-tile"));
+ const sourceTiles=Array.from(document.querySelectorAll("#spatial-source .spatial-tile"));
  const columnsHost=document.querySelector("#spatial-columns");
  let rebuildTimer;
  function buildMovingGallery(){
