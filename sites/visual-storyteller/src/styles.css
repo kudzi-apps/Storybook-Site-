@@ -717,3 +717,59 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
 .spatial-tile{background:var(--vs-tile,#171717)!important}
 .spatial-tile:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:var(--vs-tile,transparent);mix-blend-mode:color}
 .manifesto,.section{background:linear-gradient(var(--vs-panel,rgba(17,18,21,.3)),var(--vs-panel,rgba(17,18,21,.3)))!important}
+
+
+/* Visual Storyteller: continuous masonry photo field */
+.spatial-gallery{
+ height:100svh!important;min-height:620px!important;max-height:none!important;
+ position:relative!important;isolation:isolate;overflow:hidden!important;
+ padding:112px 3.5vw 102px!important;margin:0!important;
+ background:transparent!important;
+}
+.spatial-world{
+ position:relative!important;width:100%!important;height:100%!important;min-height:0!important;
+ margin:0!important;perspective:1450px;perspective-origin:50% 44%;
+ transform-style:preserve-3d;overflow:hidden!important;
+ -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 9%,#000 91%,transparent 100%);
+ mask-image:linear-gradient(to bottom,transparent 0%,#000 9%,#000 91%,transparent 100%);
+}
+.spatial-columns{height:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(9px,1.35vw,20px);align-items:start;transform-style:preserve-3d}
+.spatial-column{height:100%;min-width:0;overflow:visible;transform-style:preserve-3d;will-change:transform}
+.spatial-column.depth-0{transform:translateZ(34px) scale(1.025);z-index:3}
+.spatial-column.depth-1{transform:translateZ(-22px) scale(.97);z-index:1;filter:saturate(.84) brightness(.88)}
+.spatial-column.depth-2{transform:translateZ(8px);z-index:2;filter:saturate(.94)}
+.spatial-track{display:flex;flex-direction:column;gap:clamp(10px,1.4vw,19px);will-change:transform;animation:vs-photo-drift var(--drift-duration,125s) linear infinite;animation-delay:var(--drift-delay,0s)}
+@keyframes vs-photo-drift{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+.spatial-tile.drift-tile{
+ --tilt:0deg;position:relative!important;inset:auto!important;left:auto!important;top:auto!important;
+ display:block;width:100%!important;height:auto!important;aspect-ratio:1.08!important;
+ min-height:0!important;padding:0!important;margin:0!important;
+ border:1px solid rgba(255,255,255,.22)!important;border-radius:5px!important;
+ overflow:hidden!important;background:#17191c!important;cursor:pointer;
+ transform:rotate(var(--tilt))!important;transform-style:preserve-3d;
+ box-shadow:0 14px 34px rgba(0,0,0,.38),0 1px 0 rgba(255,255,255,.12) inset!important;
+ transition:transform .45s ease,border-color .45s ease,box-shadow .45s ease!important;
+ filter:none!important;
+}
+.spatial-tile.drift-tile:nth-child(4n+1){aspect-ratio:.82!important}
+.spatial-tile.drift-tile:nth-child(5n+2){aspect-ratio:1.32!important}
+.spatial-tile.drift-tile:nth-child(7n+4){aspect-ratio:1.58!important}
+.spatial-tile.drift-tile img{display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.88) saturate(.9);transition:transform 1s ease,filter .7s ease}
+.spatial-tile.drift-tile:before{content:none!important}
+.spatial-tile.drift-tile:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(145deg,rgba(255,255,255,.1),transparent 28%,transparent 72%,rgba(0,0,0,.18))}
+.spatial-tile.drift-tile:hover,.spatial-tile.drift-tile:focus-visible{z-index:8!important;transform:rotate(0deg) scale(1.035)!important;border-color:rgba(242,180,169,.85)!important;box-shadow:0 22px 50px rgba(0,0,0,.62),0 0 24px rgba(220,145,132,.13)!important}
+.spatial-tile.drift-tile:hover img,.spatial-tile.drift-tile:focus-visible img{transform:scale(1.055);filter:brightness(1) saturate(1)}
+.spatial-world.gallery-paused .spatial-track{animation-play-state:paused}
+@media(max-width:700px){
+ .spatial-gallery{min-height:560px!important;padding:88px 12px 78px!important}
+ .spatial-columns{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .spatial-column.depth-0{transform:translateZ(18px) scale(1.01)}
+ .spatial-column.depth-1{transform:translateZ(-10px) scale(.98)}
+ .spatial-column.depth-2{transform:translateZ(4px)}
+ .spatial-track{gap:9px}
+ .spatial-tile.drift-tile{border-radius:4px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .spatial-track{animation:none!important;transform:none!important}
+ .spatial-tile.drift-tile,.spatial-tile.drift-tile img{transition:none!important}
+}
