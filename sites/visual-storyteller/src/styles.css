@@ -599,3 +599,32 @@ body.panel-open{overflow:hidden}
 .panel-backdrop{inset:96px 0 96px;z-index:90}
 .topbar,footer.bottom-nav{z-index:100!important}
 @media(max-width:650px){.panel-backdrop{inset:76px 0 78px}.info-panel{top:80px;bottom:82px}}
+
+
+/* Mobile navigation correction: keep the three service links on one line */
+@media(max-width:650px){
+ .topbar{display:flex!important;align-items:center!important;gap:8px!important;padding:5px 12px!important}
+ .topbar .brand{flex:0 0 112px!important;width:112px!important;min-width:112px!important;height:48px!important}
+ .topbar nav{
+  display:flex!important;position:static!important;inset:auto!important;
+  flex:1 1 auto!important;min-width:0!important;width:auto!important;
+  flex-direction:row!important;align-items:center!important;justify-content:space-evenly!important;
+  gap:0!important;padding:0!important;margin:0!important;
+  border:0!important;background:transparent!important;backdrop-filter:none!important;
+ }
+ .topbar nav button{
+  display:flex!important;flex:1 1 0!important;min-width:0!important;
+  align-items:center!important;justify-content:center!important;
+  white-space:nowrap!important;overflow:visible!important;
+  padding:10px 3px!important;font-size:clamp(9px,2.5vw,12px)!important;
+  line-height:1.1!important;text-align:center!important;
+ }
+ .topbar nav button+button{border-left:1px solid rgba(255,255,255,.3)!important}
+ .topbar .menu-toggle{display:none!important}
+ .bottom-nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:center!important}
+ .bottom-nav button{min-width:0!important;padding:8px 2px!important;font-size:clamp(9px,2.5vw,12px)!important;white-space:nowrap!important}
+ .bottom-nav button+button{border-left:1px solid rgba(255,255,255,.3)!important}
+}
+@media(min-width:651px){
+ .bottom-nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
