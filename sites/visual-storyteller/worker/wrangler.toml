@@ -1,0 +1,17 @@
+name = "visual-storyteller-media-api"
+main = "src/index.js"
+compatibility_date = "2026-11-04"
+
+# Replace the placeholder bucket and database IDs after creating the Cloudflare resources.
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "visual-storyteller-media"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "visual-storyteller-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[vars]
+ALLOWED_ORIGINS = "https://visual-story-teller.pages.dev"
