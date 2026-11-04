@@ -628,3 +628,9 @@ body.panel-open{overflow:hidden}
 @media(min-width:651px){
  .bottom-nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}
 }
+
+.faq-item{border-bottom:1px solid #ffffff30;padding:16px 2px}
+.faq-item summary{cursor:pointer;font-size:14px;line-height:1.5;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq-item summary:after{content:"＋";color:#e7a49c;font-size:18px}
+.faq-item[open] summary:after{content:"−"}
+.faq-item p{color:#c7c9cd;font-size:12px;line-height:1.7;margin:12px 0 2px;max-width:680px}
