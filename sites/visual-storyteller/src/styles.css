@@ -918,3 +918,6 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
 @media(min-width:701px){.spatial-gallery:before{transform:rotateX(var(--vs-bg-desktop-tilt,50deg)) scale(1.12)!important;}.spatial-world{transform:translate3d(0,var(--scroll-camera-y,0px),0) rotateX(50deg)!important;}}
 
 @media(max-width:700px){.spatial-world{transform:rotateX(12deg) scale(1.035)!important;transform-origin:50% 50%!important;}.spatial-gallery:before{transform:rotateX(12deg) scale(1.12)!important;transform-origin:50% 50%!important;}}
+
+/* Stronger desktop perspective for the 50-degree camera test */
+@media(min-width:701px){.spatial-gallery{perspective:650px!important;perspective-origin:50% 42%!important;}}
