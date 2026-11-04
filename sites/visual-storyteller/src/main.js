@@ -215,6 +215,12 @@ function renderFAQ(){const items=[["How do I book?","Choose a service and packag
   root.setProperty("--vs-footer",rgba(color(c.footer),o["bottom-bar"]));
   root.setProperty("--vs-panel",rgba(color(c.tiles),o.panels));
   root.setProperty("--vs-text",color(c.font));
+  const bg=a.backgroundImage||{},key=bg.key||"";
+  if(key){const publicUrl="https://visual-storyteller-media-api.kudzaimagigi99.workers.dev/api/public/media/"+key.split("/").map(encodeURIComponent).join("/");root.setProperty("--vs-bg-image",'url("'+publicUrl+'")');}else{root.setProperty("--vs-bg-image","none");}
+  root.setProperty("--vs-bg-image-opacity",String(Math.max(0,Math.min(100,Number(bg.opacity??100)))/100));
+  root.setProperty("--vs-bg-image-blur",Math.max(0,Math.min(20,Number(bg.blur??0)))+"px");
+  root.setProperty("--vs-bg-image-overlay",String(Math.max(0,Math.min(90,Number(bg.overlay??35)))/100));
+  root.setProperty("--vs-bg-desktop-tilt",Math.max(0,Math.min(60,Number(bg.desktopTilt??50)))+"deg");
   document.body.style.color=color(c.font);
  }catch(error){/* Retain the default design if settings are unavailable. */}
 })();
