@@ -889,6 +889,7 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
  filter:brightness(.72) saturate(.78);
 }
 .spatial-world{
+ z-index:1!important;
  transform:translate3d(0,var(--scroll-camera-y,0px),0) rotateX(17deg)!important;
  transform-origin:50% 0%!important;
 }
