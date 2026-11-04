@@ -16,3 +16,10 @@
 .alpha-control input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:8px;background:linear-gradient(90deg,#777,#ddd)}
 .alpha-control input[type=range]::-moz-range-track{height:5px;border-radius:8px;background:linear-gradient(90deg,#777,#ddd)}
 .font-preview{min-height:78px;display:flex;align-items:center}
+
+.typography-editor{grid-column:1/-1}
+.type-target-note{font-size:10px;line-height:1.5;color:var(--muted);padding:9px 11px;border-left:2px solid var(--accent);background:#ffffff06}
+.type-size-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.type-size-grid .alpha-control{grid-template-columns:90px 1fr 54px}
+#reset-type-target{justify-self:start}
+@media(max-width:700px){.type-size-grid{grid-template-columns:1fr}.type-size-grid .alpha-control{grid-template-columns:90px 1fr 54px}.typography-editor{grid-column:auto}}
