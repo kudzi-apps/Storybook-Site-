@@ -713,3 +713,7 @@ footer{background:var(--vs-footer)!important}
 
 body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rgba(9,6,4,0))),radial-gradient(circle at 13% 18%,rgba(227,165,105,.12),transparent 19%),radial-gradient(circle at 88% 62%,rgba(178,40,48,.12),transparent 24%)!important}
 .intro,.section-note,.panel-intro,.portfolio-caption,.service-bottom small{font-size:calc(var(--vs-font-size,16px)*.88)}
+
+.spatial-tile{background:var(--vs-tile,#171717)!important}
+.spatial-tile:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:var(--vs-tile,transparent);mix-blend-mode:color}
+.manifesto,.section{background:linear-gradient(var(--vs-panel,rgba(17,18,21,.3)),var(--vs-panel,rgba(17,18,21,.3)))!important}
