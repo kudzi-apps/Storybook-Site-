@@ -71,7 +71,7 @@ export default {
       if (!title || !["Photography","Videography","Storybook"].includes(category)) return response({ error: "A title and valid category are required" }, request, env, 400);
       const id = crypto.randomUUID();
       await env.db.prepare("INSERT INTO projects (id,title,category,description,location,project_date,cover_key,status,sort_order) VALUES (?,?,?,?,?,?,?,?,?)")
-        .bind(id,title,String(body.description || "").slice(0,4000),String(body.location || "").slice(0,200),body.project_date || null,body.cover_key || null,body.status === "published" ? "published" : "draft",Number.isInteger(body.sort_order) ? body.sort_order : 0).run();
+        .bind(id,title,category,String(body.description || "").slice(0,4000),String(body.location || "").slice(0,200),body.project_date || null,body.cover_key || null,body.status === "published" ? "published" : "draft",Number.isInteger(body.sort_order) ? body.sort_order : 0).run();
       return response({ id, created: true }, request, env, 201);
     }
     if (url.pathname.startsWith("/api/projects/")) {
