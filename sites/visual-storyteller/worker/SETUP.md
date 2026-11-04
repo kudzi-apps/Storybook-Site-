@@ -35,3 +35,13 @@ All media endpoints require `Authorization: Bearer <ADMIN_TOKEN>`.
 - CORS is restricted by `ALLOWED_ORIGINS`; update it only with the exact production/admin origins.
 - The first upload implementation has a 100 MB request limit. Larger video masters need multipart upload support before they are enabled in the dashboard.
 - The Worker currently provides the storage API foundation. D1 project CRUD, login/session handling, upload UI, public published-media delivery and revision publishing are subsequent implementation steps; the dashboard must not be treated as production-ready until those are implemented and tested.
+
+## Cloudflare Git deployment
+
+The Cloudflare Worker Git integration should use this directory as its root: `sites/visual-storyteller/worker`.
+
+- Build command: leave blank.
+- Deploy command: `npm run deploy`.
+- Production branch: `main`.
+
+The deploy script applies the remote D1 migrations before deploying the Worker. Configure the `ADMIN_TOKEN` Worker secret separately in Cloudflare before using authenticated Studio features.
