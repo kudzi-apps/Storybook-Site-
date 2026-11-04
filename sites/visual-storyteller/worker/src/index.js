@@ -86,6 +86,13 @@ export default {
       return new Response(object.body, { headers });
     }
 
+    if (url.pathname === "/api/public/settings" && request.method === "GET") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const rows = await env.db.prepare("SELECT key,value FROM site_settings").all();
+      const all = Object.fromEntries((rows.results || []).map(row => [row.key, JSON.parse(row.value)]));
+      return response({ settings: all }, request, env, 200, { "cache-control": "public, max-age=60" });
+    }
+
     if (url.pathname === "/api/public/projects" && request.method === "GET") {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const rows = await env.db.prepare("SELECT id,title,category,description,location,project_date,cover_key,sort_order FROM projects WHERE status='published' ORDER BY sort_order ASC, updated_at DESC").all();
