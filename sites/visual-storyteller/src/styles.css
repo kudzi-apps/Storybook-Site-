@@ -636,8 +636,8 @@ body.panel-open{overflow:hidden}
 .faq-item p{color:#c7c9cd;font-size:12px;line-height:1.7;margin:12px 0 2px;max-width:680px}
 
 /* Primary bottom navigation action aligned beneath the brand mark */
-.bottom-nav .nav-quote{font-weight:700!important;color:#fff!important;text-shadow:0 0 16px rgba(255,255,255,.18);background:rgba(255,255,255,.075);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24)}
-.bottom-nav .nav-quote:hover{background:rgba(255,255,255,.14)}
+.bottom-nav .nav-quote{font-size:clamp(15px,1.65vw,19px)!important;font-weight:700!important;letter-spacing:-.045em!important;color:#fff!important;text-shadow:0 0 16px rgba(255,255,255,.18);background:transparent!important;box-shadow:none!important;border:0!important}
+.bottom-nav .nav-quote:hover{background:transparent!important;color:#f2b4a9!important}
 
 
 /* About panel: bio, location, social link and equal contact actions */
