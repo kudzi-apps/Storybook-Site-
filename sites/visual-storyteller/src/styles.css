@@ -821,3 +821,22 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
 }
 
 .spatial-world.gallery-paused .spatial-track{animation-play-state:paused!important}
+
+
+/* Desktop gallery correction: disable the legacy tilted floor camera */
+@media(min-width:701px){
+ .spatial-gallery{
+  position:fixed!important;inset:0!important;width:100vw!important;height:100svh!important;
+  min-height:0!important;padding:100px 3.5vw 100px!important;
+  overflow:hidden!important;z-index:1;
+ }
+ .spatial-world{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  min-height:0!important;margin:0!important;overflow:hidden!important;
+  transform:none!important;transform-origin:50% 50%!important;
+  perspective:none!important;transform-style:flat!important;transition:none!important;
+ }
+ .spatial-source.gallery-ready{
+  transform:none!important;perspective:none!important;
+ }
+}
