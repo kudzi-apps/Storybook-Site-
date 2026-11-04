@@ -8,7 +8,7 @@ binding = "MEDIA"
 bucket_name = "visual-storyteller-media"
 
 [[d1_databases]]
-binding = "DB"
+binding = "db"
 database_name = "visual-storyteller-db"
 database_id = "20fabd95-1953-42b6-9151-82676a8d2f10"
 migrations_dir = "migrations"
