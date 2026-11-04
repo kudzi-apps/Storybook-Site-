@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#0b0c0e">
 <title>Site Studio — Visual Storyteller</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Cormorant+Garamond:wght@400;500;600&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Oswald:wght@300;400;500;600&family=Raleway:wght@300;400;500;700&family=Libre+Baskerville:wght@400;700&family=Merriweather:wght@300;400;700&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Allura&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./studio.css">
 </head>
 <body>
@@ -33,11 +33,11 @@
 <div class="view-heading"><div><h1>Appearance</h1></div><button class="button primary" id="save-appearance">Save changes</button></div>
 <div class="appearance-stack">
 <div class="editor-card"><h3>Section colours</h3><p class="helper">Move each slider across the brand palette. Stops are fixed to keep the palette consistent.</p>
-<div class="color-control"><label for="color-font">Typography</label><input id="color-font" type="range" min="0" max="100" step="1" value="50" data-color-target="font"><output id="color-font-value">Soft white</output></div>
-<div class="color-control"><label for="color-background">Background</label><input id="color-background" type="range" min="0" max="100" step="1" value="0" data-color-target="background"><output id="color-background-value">Charcoal</output></div>
-<div class="color-control"><label for="color-tiles">Tiles</label><input id="color-tiles" type="range" min="0" max="100" step="1" value="25" data-color-target="tiles"><output id="color-tiles-value">Pastel red</output></div>
-<div class="color-control"><label for="color-topbar">Top bar</label><input id="color-topbar" type="range" min="0" max="100" step="1" value="0" data-color-target="topbar"><output id="color-topbar-value">Charcoal</output></div>
-<div class="color-control"><label for="color-footer">Bottom bar</label><input id="color-footer" type="range" min="0" max="100" step="1" value="0" data-color-target="footer"><output id="color-footer-value">Charcoal</output></div>
+<div class="color-control"><label for="color-font">Typography</label><input id="color-font" type="range" min="0" max="100" step="20" value="50" data-color-target="font"><output id="color-font-value">Soft white</output></div>
+<div class="color-control"><label for="color-background">Background</label><input id="color-background" type="range" min="0" max="100" step="20" value="0" data-color-target="background"><output id="color-background-value">Charcoal</output></div>
+<div class="color-control"><label for="color-tiles">Tiles</label><input id="color-tiles" type="range" min="0" max="100" step="20" value="25" data-color-target="tiles"><output id="color-tiles-value">Pastel red</output></div>
+<div class="color-control"><label for="color-topbar">Top bar</label><input id="color-topbar" type="range" min="0" max="100" step="20" value="0" data-color-target="topbar"><output id="color-topbar-value">Charcoal</output></div>
+<div class="color-control"><label for="color-footer">Bottom bar</label><input id="color-footer" type="range" min="0" max="100" step="20" value="0" data-color-target="footer"><output id="color-footer-value">Charcoal</output></div>
 <label class="uniform-row"><input type="checkbox" id="uniform-colours"> Uniformise section colours</label>
 </div>
 <div class="editor-card"><h3>Transparency</h3>
@@ -45,7 +45,7 @@
 </div>
 <div class="editor-card"><h3>Typography</h3>
 <label class="font-row">Font family <select id="font-family">
-<option>Ubuntu</option><option>Lato</option><option>Cormorant Garamond</option><option>Brittany Signature</option><option>Montserrat</option><option>Playfair Display</option><option>DM Sans</option><option>Poppins</option><option>Roboto</option><option>Open Sans</option><option>Oswald</option><option>Raleway</option><option>Libre Baskerville</option><option>Merriweather</option><option>Dancing Script</option><option>Great Vibes</option><option>Allura</option>
+<option>Ubuntu</option><option>Lato</option><option>Cormorant Garamond</option><option value="Brittany Signature">Brittany Signature (script)</option><option>Montserrat</option><option>Playfair Display</option><option>DM Sans</option><option>Poppins</option><option>Roboto</option><option>Open Sans</option><option>Oswald</option><option>Raleway</option><option>Libre Baskerville</option><option>Merriweather</option><option>Dancing Script</option><option>Great Vibes</option><option>Allura</option>
 </select></label>
 <label class="font-row">Font weight <select id="font-weight"><option value="300">Light</option><option value="400" selected>Regular</option><option value="500">Medium</option><option value="600">Semi-bold</option><option value="700">Bold</option></select></label>
 <div class="type-toggles"><label><input type="checkbox" id="font-italic"> Italic</label><label><input type="checkbox" id="font-bold"> Bold</label></div>
