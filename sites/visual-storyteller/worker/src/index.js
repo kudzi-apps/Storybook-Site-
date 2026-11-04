@@ -49,6 +49,19 @@ export default {
     if (url.pathname === "/api/health" && request.method === "GET") {
       return response({ ok: true, service: "visual-storyteller-media-api", storage: Boolean(env.MEDIA), database: Boolean(env.db) }, request, env);
     }
+    if (url.pathname.startsWith("/api/public/media/") && request.method === "GET") {
+      if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
+      const key = safeKey(decodeURIComponent(url.pathname.slice("/api/public/media/".length)));
+      if (!key) return response({ error: "Invalid object key" }, request, env, 400);
+      const object = await env.MEDIA.get(key);
+      if (!object) return response({ error: "Not found" }, request, env, 404);
+      const headers = new Headers(corsHeaders(request, env));
+      object.writeHttpMetadata(headers);
+      headers.set("etag", object.httpEtag);
+      headers.set("cache-control", "public, max-age=3600");
+      return new Response(object.body, { headers });
+    }
+
     if (url.pathname === "/api/public/projects" && request.method === "GET") {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const rows = await env.db.prepare("SELECT id,title,category,description,location,project_date,cover_key,sort_order FROM projects WHERE status='published' ORDER BY sort_order ASC, updated_at DESC").all();
@@ -96,6 +109,32 @@ export default {
         await env.db.prepare("DELETE FROM projects WHERE id=?").bind(id).run();
         return response({ deleted: true, id }, request, env);
       }
+    }
+
+    if (url.pathname === "/api/settings" && request.method === "GET") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const rows = await env.db.prepare("SELECT key,value FROM site_settings").all();
+      return response({ settings: Object.fromEntries((rows.results || []).map(row => [row.key, JSON.parse(row.value)])) }, request, env);
+    }
+    if (url.pathname === "/api/settings" && request.method === "PUT") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const body = await request.json().catch(() => null);
+      if (!body || !body.settings || typeof body.settings !== "object") return response({ error: "Settings object is required" }, request, env, 400);
+      for (const [key,value] of Object.entries(body.settings)) {
+        if (!/^[a-zA-Z0-9_-]{1,80}$/.test(key)) continue;
+        await env.db.prepare("INSERT INTO site_settings (key,value,updated_at) VALUES (?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=datetime('now')").bind(key,JSON.stringify(value)).run();
+      }
+      return response({ saved: true }, request, env);
+    }
+    if (url.pathname === "/api/publish" && request.method === "POST") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const projects = await env.db.prepare("SELECT * FROM projects ORDER BY sort_order ASC,updated_at DESC").all();
+      const settings = await env.db.prepare("SELECT key,value FROM site_settings").all();
+      const snapshot = JSON.stringify({ projects: projects.results || [], settings: settings.results || [] });
+      const id = crypto.randomUUID();
+      await env.db.prepare("INSERT INTO publish_revisions (id,snapshot_json) VALUES (?,?)").bind(id,snapshot).run();
+      const count = (projects.results || []).filter(p => p.status === "published").length;
+      return response({ published: true, revision: id, projectCount: count }, request, env);
     }
 
     if (url.pathname === "/api/media" && request.method === "GET") {
