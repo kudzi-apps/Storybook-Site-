@@ -167,8 +167,7 @@ if(world){
  }
  buildMovingGallery();
  window.addEventListener("resize",()=>{clearTimeout(rebuildTimer);rebuildTimer=setTimeout(buildMovingGallery,180);},{passive:true});
- world.addEventListener("pointerenter",()=>world.classList.add("gallery-paused"));
- world.addEventListener("pointerleave",()=>world.classList.remove("gallery-paused"));
+ world.addEventListener("pointerdown",()=>{world.classList.add("gallery-paused");setTimeout(()=>world.classList.remove("gallery-paused"),1800);});
  world.addEventListener("focusin",()=>world.classList.add("gallery-paused"));
  world.addEventListener("focusout",event=>{if(!world.contains(event.relatedTarget))world.classList.remove("gallery-paused");});
  world.addEventListener("touchstart",()=>world.classList.add("gallery-paused"),{passive:true});
