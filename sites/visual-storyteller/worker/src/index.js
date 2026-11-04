@@ -52,6 +52,52 @@ export default {
     const denied = await requireAdmin(request, env);
     if (denied) return response({ error: "Unauthorised" }, request, env, 401);
 
+    if (url.pathname === "/api/public/projects" && request.method === "GET") {
+      if (!env.DB) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const rows = await env.DB.prepare("SELECT id,title,category,description,location,project_date,cover_key,sort_order FROM projects WHERE status='published' ORDER BY sort_order ASC, updated_at DESC").all();
+      return response({ projects: rows.results || [] }, request, env);
+    }
+
+    if (url.pathname === "/api/projects" && request.method === "GET") {
+      if (!env.DB) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const rows = await env.DB.prepare("SELECT * FROM projects ORDER BY sort_order ASC, updated_at DESC").all();
+      return response({ projects: rows.results || [] }, request, env);
+    }
+    if (url.pathname === "/api/projects" && request.method === "POST") {
+      if (!env.DB) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const body = await request.json().catch(() => null);
+      const category = body?.category;
+      const title = String(body?.title || "").trim().slice(0, 160);
+      if (!title || !["Photography","Videography","Storybook"].includes(category)) return response({ error: "A title and valid category are required" }, request, env, 400);
+      const id = crypto.randomUUID();
+      await env.DB.prepare("INSERT INTO projects (id,title,category,description,location,project_date,cover_key,status,sort_order) VALUES (?,?,?,?,?,?,?,?,?)")
+        .bind(id,title,String(body.description || "").slice(0,4000),String(body.location || "").slice(0,200),body.project_date || null,body.cover_key || null,body.status === "published" ? "published" : "draft",Number.isInteger(body.sort_order) ? body.sort_order : 0).run();
+      return response({ id, created: true }, request, env, 201);
+    }
+    if (url.pathname.startsWith("/api/projects/")) {
+      if (!env.DB) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const id = url.pathname.slice("/api/projects/".length);
+      if (!id || id.includes("/")) return response({ error: "Invalid project ID" }, request, env, 400);
+      if (request.method === "PUT") {
+        const body = await request.json().catch(() => null);
+        if (!body) return response({ error: "Invalid project data" }, request, env, 400);
+        const category = body.category;
+        if (category && !["Photography","Videography","Storybook"].includes(category)) return response({ error: "Invalid category" }, request, env, 400);
+        const current = await env.DB.prepare("SELECT * FROM projects WHERE id=?").bind(id).first();
+        if (!current) return response({ error: "Project not found" }, request, env, 404);
+        const next = { ...current, ...body };
+        if (!String(next.title || "").trim()) return response({ error: "Title is required" }, request, env, 400);
+        if (!["draft","published"].includes(next.status)) return response({ error: "Invalid status" }, request, env, 400);
+        await env.DB.prepare("UPDATE projects SET title=?,category=?,description=?,location=?,project_date=?,cover_key=?,status=?,sort_order=?,updated_at=datetime('now') WHERE id=?")
+          .bind(String(next.title).trim().slice(0,160),next.category,String(next.description || "").slice(0,4000),String(next.location || "").slice(0,200),next.project_date || null,next.cover_key || null,next.status,Number.isInteger(next.sort_order) ? next.sort_order : 0,id).run();
+        return response({ updated: true, id }, request, env);
+      }
+      if (request.method === "DELETE") {
+        await env.DB.prepare("DELETE FROM projects WHERE id=?").bind(id).run();
+        return response({ deleted: true, id }, request, env);
+      }
+    }
+
     if (url.pathname === "/api/media" && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
       const prefix = url.searchParams.get("prefix") || "";
