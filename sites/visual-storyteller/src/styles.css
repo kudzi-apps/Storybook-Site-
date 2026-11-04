@@ -710,3 +710,6 @@ body{background-color:var(--vs-bg)!important;color:var(--vs-text)}
 .service-card{background:var(--vs-tile)!important}
 footer{background:var(--vs-footer)!important}
 .manifesto,.section{background-color:var(--vs-panel)}
+
+body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rgba(9,6,4,0))),radial-gradient(circle at 13% 18%,rgba(227,165,105,.12),transparent 19%),radial-gradient(circle at 88% 62%,rgba(178,40,48,.12),transparent 24%)!important}
+.intro,.section-note,.panel-intro,.portfolio-caption,.service-bottom small{font-size:calc(var(--vs-font-size,16px)*.88)}
