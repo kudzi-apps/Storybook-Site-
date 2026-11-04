@@ -659,3 +659,18 @@ body.panel-open{overflow:hidden}
 .about-email{background:#fff;color:#111}
 .about-whatsapp{background:#ffffff10;color:#fff}
 @media(max-width:650px){.about-map{height:185px}.about-contact p{font-size:11px}.about-actions{gap:8px}.about-action{min-height:46px}}
+
+/* Terms panel and booking consent */
+.terms-actions{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 26px}
+.terms-actions a{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border:1px solid #ffffff55;border-radius:9px;text-decoration:none;font-size:12px}
+.terms-download{background:#f2f2f2;color:#111;border-color:#fff!important;font-weight:600}
+.terms-online{background:#ffffff0b;color:#fff}
+.terms-section{border-top:1px solid #ffffff25;padding:16px 0}
+.terms-section h3{font:500 22px "Cormorant Garamond",serif;margin:0 0 8px;color:#fff}
+.terms-section p{font-size:11px;line-height:1.65;color:#c8cbd0;margin:7px 0}
+.terms-accept{display:flex!important;grid-template-columns:auto 1fr!important;align-items:flex-start;gap:10px!important;padding:13px;border:1px solid #ffffff35;border-radius:9px;background:#ffffff08}
+.terms-accept input{width:17px!important;height:17px;margin:2px 0 0;accent-color:#fff;flex:none}
+.terms-accept span{font-size:11px;line-height:1.6;color:#e5e5e5}
+.terms-accept a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.submit-options button:disabled{opacity:.38;cursor:not-allowed}
+@media(max-width:650px){.bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}.bottom-nav button{font-size:clamp(8px,2.15vw,11px)!important;padding-left:1px!important;padding-right:1px!important}.terms-actions a{flex:1}}
