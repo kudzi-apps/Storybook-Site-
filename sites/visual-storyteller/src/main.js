@@ -154,18 +154,28 @@ function renderFAQ(){const items=[["How do I book?","Choose a service and packag
   const response=await fetch("https://visual-storyteller-media-api.kudzaimagigi99.workers.dev/api/public/settings");
   if(!response.ok)return;
   const data=await response.json(),a=data.settings?.appearance;if(!a)return;
-  const stops=[["Charcoal","#17191c"],["Pastel red","#e9b7b5"],["Brand red","#d9363e"],["Soft white","#f1f1f1"],["Pastel green","#bfd6c4"],["Brand green","#4b8b62"]];
-  const color=v=>stops[Math.max(0,Math.min(5,Math.round(Number(v||0)/20)))][1];
+  const stops=["#17191c","#e9b7b5","#d9363e","#f1f1f1","#bfd6c4","#4b8b62"];
+  const color=v=>stops[Math.max(0,Math.min(5,Math.round(Number(v||0)/20)))];
   const rgba=(hex,opacity)=>{const n=parseInt(hex.slice(1),16);return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+Math.max(0,Math.min(100,Number(opacity??100)))/100+")";};
-  const c=a.colors||{},o=a.alpha||{},t=a.typography||{},root=document.documentElement.style;
+  const c=a.colors||{},o=a.alpha||{},types=a.typography||{},root=document.documentElement.style;
+  const global=types.global||types;
+  const fontName=t=>(t?.family==="Brittany Signature"?"Allura":(t?.family||"Ubuntu"));
+  const apply=(selector,key)=>{const t=types[key];if(!t)return;const family=fontName(t),weight=t.bold?"700":(t.weight||"400"),size=t.size||global.size||16,mobile=t.mobileSize||size;const styleId="vs-type-"+key;let style=document.getElementById(styleId);if(!style){style=document.createElement("style");style.id=styleId;document.head.appendChild(style);}const rule=selector+"{font-family:'"+family+"',sans-serif!important;font-weight:"+weight+"!important;font-style:"+(t.italic?"italic":"normal")+"!important;font-size:"+size+"px!important}@media(max-width:700px){"+selector+"{font-size:"+mobile+"px!important}}";style.textContent=rule;};
+  if(global){const family=fontName(global);root.setProperty("--vs-font-size",(global.size||16)+"px");document.body.style.fontFamily="'"+family+"',sans-serif";document.body.style.fontWeight=global.bold?"700":(global.weight||"400");document.body.style.fontStyle=global.italic?"italic":"normal";}
+  apply(".topbar nav button","navigation");
+  apply(".spatial-tile .tile-copy b","tileTitle");
+  apply(".spatial-tile .tile-copy small, .spatial-tile .tile-copy i","tileDescription");
+  apply("h1","headings");
+  apply("h2,h3,.section-heading","subheadings");
+  apply("p,.panel-intro,.panel-note","body");
+  apply("button,.button,.add-quote,.terms-download,.terms-online","buttons");
+  apply("footer,footer *","footer");
   root.setProperty("--vs-bg",rgba(color(c.background),o.background));
   root.setProperty("--vs-tile",rgba(color(c.tiles),o.tiles));
   root.setProperty("--vs-topbar",rgba(color(c.topbar),o["top-bar"]));
   root.setProperty("--vs-footer",rgba(color(c.footer),o["bottom-bar"]));
   root.setProperty("--vs-panel",rgba(color(c.tiles),o.panels));
   root.setProperty("--vs-text",color(c.font));
-  const family=t.family==="Brittany Signature"?"Allura":(t.family||"Ubuntu");root.setProperty("--vs-font-size",(t.size||16)+"px");
-  document.querySelectorAll("body,body h1,body h2,body h3,body p,body a,body button,body nav,body footer,body .eyebrow").forEach(el=>{el.style.fontFamily="'"+family+"',sans-serif";el.style.fontWeight=t.bold?"700":(t.weight||"400");el.style.fontStyle=t.italic?"italic":"normal";});
   document.body.style.color=color(c.font);
- }catch(error){/* Keep the default site design if settings are unavailable. */}
+ }catch(error){/* Retain the default design if settings are unavailable. */}
 })();
