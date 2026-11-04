@@ -695,3 +695,8 @@ body.panel-open{overflow:hidden}
 .quote-slider-note{font-size:11px;line-height:1.6;color:#bfc2c8;margin:15px 0}
 @media(max-width:520px){.quote-service-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.quote-service-tile{min-height:108px;padding:11px}.quote-config-head h3{font-size:24px}}
 
+
+.quote-continue{display:block;width:100%;margin-top:12px;padding:14px 18px;border:1px solid #ffffff70;border-radius:9px;background:#ffffff12;color:#fff;font:600 13px Ubuntu,sans-serif;cursor:pointer}
+.quote-continue:hover{background:#ffffff20}
+.quote-back{margin-top:14px;padding:8px 0;border:0;background:transparent;color:#d7b1aa;font:500 12px Ubuntu,sans-serif;cursor:pointer}
+@media(max-width:520px){.quote-config{margin-top:4px}.quote-config-head{margin-bottom:15px}.quote-service-tile small{font-size:9px}}
