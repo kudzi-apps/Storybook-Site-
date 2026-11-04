@@ -22,7 +22,7 @@ function authorised(request, env) {
   const expected = env.ADMIN_TOKEN;
   const supplied = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   return Boolean(expected && supplied && supplied.length === expected.length &&
-    crypto.subtle.digest && timingSafeEqual(supplied, expected));
+    timingSafeEqual(supplied, expected));
 }
 function timingSafeEqual(a, b) {
   let diff = 0;
@@ -49,14 +49,14 @@ export default {
     if (url.pathname === "/api/health" && request.method === "GET") {
       return response({ ok: true, service: "visual-storyteller-media-api", storage: Boolean(env.MEDIA), database: Boolean(env.DB) }, request, env);
     }
-    const denied = await requireAdmin(request, env);
-    if (denied) return response({ error: "Unauthorised" }, request, env, 401);
-
     if (url.pathname === "/api/public/projects" && request.method === "GET") {
       if (!env.DB) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const rows = await env.DB.prepare("SELECT id,title,category,description,location,project_date,cover_key,sort_order FROM projects WHERE status='published' ORDER BY sort_order ASC, updated_at DESC").all();
       return response({ projects: rows.results || [] }, request, env);
     }
+
+    const denied = await requireAdmin(request, env);
+    if (denied) return response({ error: "Unauthorised" }, request, env, 401);
 
     if (url.pathname === "/api/projects" && request.method === "GET") {
       if (!env.DB) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
