@@ -869,3 +869,43 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
   inset:-1% -.5%!important;width:101%!important;height:102%!important;
  }
 }
+
+
+/* Shared camera test: background and moving photographs use one tilt angle */
+.spatial-gallery{
+ perspective:1250px!important;
+ perspective-origin:50% 50%!important;
+ background:#08090b!important;
+}
+.spatial-gallery:before{
+ content:"";position:absolute;z-index:0;pointer-events:none;
+ inset:-18% -12%;
+ transform:rotateX(17deg) scale(1.12);
+ transform-origin:50% 0%;
+ background:
+  linear-gradient(90deg,rgba(0,0,0,.48),rgba(0,0,0,.16) 50%,rgba(0,0,0,.48)),
+  linear-gradient(0deg,rgba(0,0,0,.5),rgba(0,0,0,.12) 48%,rgba(0,0,0,.38)),
+  url("https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=2400&q=90") center/cover no-repeat;
+ filter:brightness(.72) saturate(.78);
+}
+.spatial-world{
+ transform:translate3d(0,var(--scroll-camera-y,0px),0) rotateX(17deg)!important;
+ transform-origin:50% 0%!important;
+}
+@media(max-width:900px){
+ .spatial-gallery{perspective:1100px!important}
+ .spatial-world{transform:translate3d(0,var(--scroll-camera-y,0px),0) rotateX(17deg)!important}
+}
+@media(max-width:650px){
+ .spatial-gallery{perspective:1050px!important;perspective-origin:50% 50%!important}
+ .spatial-gallery:before{
+  inset:-12% -18%;
+  transform:rotateX(12deg) scale(1.12);
+  transform-origin:50% 50%;
+ }
+ .spatial-world{
+  transform:rotateX(12deg) scale(1.035)!important;
+  transform-origin:50% 50%!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){.spatial-world{transition:none!important}}
