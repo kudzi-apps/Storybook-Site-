@@ -773,3 +773,32 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
  .spatial-track{animation:none!important;transform:none!important}
  .spatial-tile.drift-tile,.spatial-tile.drift-tile img{transition:none!important}
 }
+
+
+/* Robust gallery layout: images render directly without JS-generated columns */
+.spatial-source.gallery-ready,.spatial-source{
+ display:block!important;visibility:visible!important;position:relative!important;
+ width:100%!important;height:100%!important;overflow:hidden!important;
+ columns:5;column-gap:clamp(9px,1.35vw,20px);column-fill:auto;
+}
+.spatial-source .spatial-tile.drift-tile{
+ position:relative!important;display:inline-block!important;vertical-align:top;
+ width:100%!important;height:auto!important;min-height:0!important;
+ margin:0 0 clamp(10px,1.4vw,19px)!important;break-inside:avoid!important;
+ page-break-inside:avoid!important;inset:auto!important;
+ aspect-ratio:1.08!important;transform:rotate(var(--tilt,0deg))!important;
+}
+.spatial-source .spatial-tile.drift-tile:nth-child(4n+1){aspect-ratio:.82!important}
+.spatial-source .spatial-tile.drift-tile:nth-child(5n+2){aspect-ratio:1.32!important}
+.spatial-source .spatial-tile.drift-tile:nth-child(7n+4){aspect-ratio:1.58!important}
+.spatial-source .spatial-tile.drift-tile img{display:block;width:100%;height:100%;object-fit:cover}
+.spatial-columns{display:none!important}
+.spatial-world.gallery-paused .spatial-source{animation-play-state:paused}
+@media(max-width:700px){
+ .spatial-source.gallery-ready,.spatial-source{columns:3;column-gap:8px}
+ .spatial-source .spatial-tile.drift-tile{margin-bottom:9px!important;border-radius:4px!important}
+}
+@media(prefers-reduced-motion:no-preference){
+ .spatial-source.gallery-ready{animation:vs-photo-drift-static 150s linear infinite}
+ @keyframes vs-photo-drift-static{from{transform:translateY(-4%)}to{transform:translateY(4%)}}
+}
