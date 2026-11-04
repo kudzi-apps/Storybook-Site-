@@ -674,3 +674,24 @@ body.panel-open{overflow:hidden}
 .terms-accept a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 .submit-options button:disabled{opacity:.38;cursor:not-allowed}
 @media(max-width:650px){.bottom-nav{grid-template-columns:repeat(4,minmax(0,1fr))!important}.bottom-nav button{font-size:clamp(9px,2.5vw,11px)!important;padding-left:1px!important;padding-right:1px!important}.bottom-nav .nav-quote{font-size:clamp(13px,3.4vw,16px)!important}.terms-actions a{flex:1}}
+
+
+/* Quote builder: service tiles, quantity controls and responsive layout */
+.quote-service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0}
+.quote-service-tile{min-height:116px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:13px;border:1px solid #ffffff30;border-radius:12px;background:linear-gradient(145deg,#ffffff12,#ffffff04);color:#fff;cursor:pointer;transition:border-color .18s,background .18s,transform .18s}
+.quote-service-tile:hover{transform:translateY(-2px);border-color:#ffffff80}
+.quote-service-tile.active{border-color:#f2b4a9;background:linear-gradient(145deg,#f2b4a91c,#ffffff08);box-shadow:inset 0 0 0 1px #f2b4a955}
+.quote-service-icon{font-size:22px;color:#f2b4a9}
+.quote-service-tile b{font-size:13px;font-weight:600}
+.quote-service-tile small{font-size:10px;line-height:1.4;color:#bfc2c8}
+.quote-config{border-top:1px solid #ffffff30;padding-top:18px;margin-top:8px}
+.quote-config-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:20px}
+.quote-config-head h3{font:500 27px "Cormorant Garamond",serif;margin:4px 0 0}
+.quote-config-head>strong{font-size:18px;white-space:nowrap}
+.quote-slider-label{display:flex;justify-content:space-between;gap:12px;color:#d8d9dc;font-size:12px;margin-bottom:12px}
+.quote-slider-label b{color:#fff;font-size:13px}
+.quote-range{width:100%;accent-color:#f2b4a9;cursor:pointer}
+.quote-range-bounds{display:flex;justify-content:space-between;color:#999da5;font-size:10px;margin-top:5px}
+.quote-slider-note{font-size:11px;line-height:1.6;color:#bfc2c8;margin:15px 0}
+@media(max-width:520px){.quote-service-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.quote-service-tile{min-height:108px;padding:11px}.quote-config-head h3{font-size:24px}}
+
