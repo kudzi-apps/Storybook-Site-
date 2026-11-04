@@ -634,3 +634,7 @@ body.panel-open{overflow:hidden}
 .faq-item summary:after{content:"＋";color:#e7a49c;font-size:18px}
 .faq-item[open] summary:after{content:"−"}
 .faq-item p{color:#c7c9cd;font-size:12px;line-height:1.7;margin:12px 0 2px;max-width:680px}
+
+/* Primary bottom navigation action aligned beneath the brand mark */
+.bottom-nav .nav-quote{font-weight:700!important;color:#fff!important;text-shadow:0 0 16px rgba(255,255,255,.18);background:rgba(255,255,255,.075);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24)}
+.bottom-nav .nav-quote:hover{background:rgba(255,255,255,.14)}
