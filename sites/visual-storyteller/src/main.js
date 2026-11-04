@@ -135,43 +135,15 @@ document.addEventListener("click",function(event){
 });
 document.addEventListener("keydown",function(event){if(event.key==="Escape"&&panel.classList.contains("open"))closePanel();});
 const world=document.querySelector("#spatial-world");
-if(world){
- const sourceTiles=Array.from(document.querySelectorAll("#spatial-source .spatial-tile"));
- const columnsHost=document.querySelector("#spatial-columns");
- let rebuildTimer;
- function buildMovingGallery(){
-  const count=window.matchMedia("(max-width:700px)").matches?3:5;
-  columnsHost.innerHTML="";
-  const columns=Array.from({length:count},(_,i)=>{
-   const column=document.createElement("div");column.className="spatial-column depth-"+(i%3);
-   const track=document.createElement("div");track.className="spatial-track";
-   column.appendChild(track);columnsHost.appendChild(column);return track;
-  });
-  sourceTiles.forEach((tile,index)=>{
-   tile.classList.add("drift-tile");
-   tile.removeAttribute("style");
-   tile.style.setProperty("--tilt",((index%5)-2)*.65+"deg");
-   tile.style.setProperty("--shape",index%7);
-   columns[index%count].appendChild(tile);
-  });
-  columns.forEach((track,index)=>{
-   const originals=Array.from(track.children);
-   originals.forEach(tile=>{
-    const clone=tile.cloneNode(true);clone.setAttribute("aria-hidden","true");clone.tabIndex=-1;
-    track.appendChild(clone);
-   });
-   const duration= count===3 ? 145+(index*17) : 112+(index*13);
-   track.style.setProperty("--drift-duration",duration+"s");
-   track.style.setProperty("--drift-delay",(-index*11)+"s");
-  });
- }
- buildMovingGallery();
- window.addEventListener("resize",()=>{clearTimeout(rebuildTimer);rebuildTimer=setTimeout(buildMovingGallery,180);},{passive:true});
+const gallerySource=document.querySelector("#spatial-source");
+if(world&&gallerySource){
+ gallerySource.classList.add("gallery-ready");
+ gallerySource.querySelectorAll(".spatial-tile").forEach((tile,index)=>{
+  tile.classList.add("drift-tile");
+  tile.removeAttribute("style");
+  tile.style.setProperty("--tilt",((index%5)-2)*.45+"deg");
+ });
  world.addEventListener("pointerdown",()=>{world.classList.add("gallery-paused");setTimeout(()=>world.classList.remove("gallery-paused"),1800);});
- world.addEventListener("focusin",()=>world.classList.add("gallery-paused"));
- world.addEventListener("focusout",event=>{if(!world.contains(event.relatedTarget))world.classList.remove("gallery-paused");});
- world.addEventListener("touchstart",()=>world.classList.add("gallery-paused"),{passive:true});
- world.addEventListener("touchend",()=>setTimeout(()=>world.classList.remove("gallery-paused"),1400),{passive:true});
 }
 updateBasket();
 
