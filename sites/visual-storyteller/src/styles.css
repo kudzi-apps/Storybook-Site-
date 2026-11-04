@@ -840,3 +840,30 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
   transform:none!important;perspective:none!important;
  }
 }
+
+
+/* Gentle 3/4 camera: tilt the gallery plane, never the individual photographs */
+@media(min-width:701px){
+ .spatial-gallery{perspective:1550px!important;perspective-origin:50% 48%!important}
+ .spatial-world{
+  transform:none!important;perspective:1550px!important;perspective-origin:50% 48%!important;
+  transform-style:preserve-3d!important;overflow:hidden!important;
+ }
+ .spatial-source.gallery-ready{
+  transform:rotateX(16deg) scale(1.035)!important;
+  transform-origin:50% 50%!important;transform-style:preserve-3d!important;
+  inset:-3% -2%!important;width:104%!important;height:106%!important;
+ }
+}
+@media(max-width:700px){
+ .spatial-gallery{perspective:1800px!important;perspective-origin:50% 48%!important}
+ .spatial-world{perspective:1800px!important;transform:none!important;overflow:hidden!important}
+ .spatial-source.gallery-ready{
+  transform:rotateX(11deg) scale(1.025)!important;
+  transform-origin:50% 50%!important;transform-style:preserve-3d!important;
+  inset:-2% -1%!important;width:102%!important;height:104%!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .spatial-source .spatial-track{animation:none!important}
+}
