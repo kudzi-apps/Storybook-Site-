@@ -164,7 +164,7 @@ function renderFAQ(){const items=[["How do I book?","Choose a service and packag
   root.setProperty("--vs-footer",rgba(color(c.footer),o["bottom-bar"]));
   root.setProperty("--vs-panel",rgba(color(c.tiles),o.panels));
   root.setProperty("--vs-text",color(c.font));
-  const family=t.family==="Brittany Signature"?"Allura":(t.family||"Ubuntu");
+  const family=t.family==="Brittany Signature"?"Allura":(t.family||"Ubuntu");root.setProperty("--vs-font-size",(t.size||16)+"px");
   document.querySelectorAll("body,body h1,body h2,body h3,body p,body a,body button,body nav,body footer,body .eyebrow").forEach(el=>{el.style.fontFamily="'"+family+"',sans-serif";el.style.fontWeight=t.bold?"700":(t.weight||"400");el.style.fontStyle=t.italic?"italic":"normal";});
   document.body.style.color=color(c.font);
  }catch(error){/* Keep the default site design if settings are unavailable. */}
