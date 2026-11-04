@@ -47,7 +47,31 @@ export default {
     const cors = corsHeaders(request, env);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
     if (url.pathname === "/api/health" && request.method === "GET") {
-      return response({ ok: true, service: "visual-storyteller-media-api", storage: Boolean(env.MEDIA), database: Boolean(env.db) }, request, env);
+      let storageReady = false;
+      let databaseReady = false;
+      let schemaReady = false;
+      try {
+        if (env.MEDIA) {
+          await env.MEDIA.list({ limit: 1 });
+          storageReady = true;
+        }
+      } catch {}
+      try {
+        if (env.db) {
+          await env.db.prepare("SELECT 1").first();
+          databaseReady = true;
+          const table = await env.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='projects'").first();
+          schemaReady = Boolean(table);
+        }
+      } catch {}
+      const ok = storageReady && databaseReady && schemaReady;
+      return response({
+        ok,
+        service: "visual-storyteller-media-api",
+        storage: storageReady,
+        database: databaseReady,
+        schema: schemaReady
+      }, request, env, ok ? 200 : 503);
     }
     if (url.pathname.startsWith("/api/public/media/") && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
