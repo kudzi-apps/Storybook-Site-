@@ -89,7 +89,12 @@ export default {
     if (url.pathname === "/api/public/projects" && request.method === "GET") {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const rows = await env.db.prepare("SELECT id,title,category,description,location,project_date,cover_key,sort_order FROM projects WHERE status='published' ORDER BY sort_order ASC, updated_at DESC").all();
-      return response({ projects: rows.results || [] }, request, env);
+      const projects = [];
+      for (const project of rows.results || []) {
+        const assets = await env.db.prepare("SELECT object_key,media_type,alt_text,sort_order FROM project_media WHERE project_id=? ORDER BY sort_order ASC,created_at ASC").bind(project.id).all();
+        projects.push({ ...project, media: (assets.results || []).map(item => ({ ...item, url: "/api/public/media/" + item.object_key.split("/").map(encodeURIComponent).join("/") })) });
+      }
+      return response({ projects }, request, env);
     }
 
     const denied = await requireAdmin(request, env);
