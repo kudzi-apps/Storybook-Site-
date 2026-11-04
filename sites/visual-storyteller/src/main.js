@@ -162,7 +162,7 @@ if(world&&gallerySource){
     clone.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
     track.appendChild(clone);
    });
-   track.style.setProperty("--drift-duration",(media.matches?32:28)+index*(media.matches?4:4)+"s");
+   track.style.setProperty("--drift-duration",(media.matches?36:32)+index*4+"s");
    track.style.setProperty("--drift-delay",(-index*8)+"s");
   });
  }
