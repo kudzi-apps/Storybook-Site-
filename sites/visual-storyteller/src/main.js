@@ -1,49 +1,39 @@
-const serviceData={
- "Photography":{description:"Honest, considered images of the people, places and moments that matter. From weddings and portraits to events and commercial work.",items:["Weddings","Portraits & people","Events","Commercial photography"]},
- "Videography":{description:"Moving pictures with feeling, rhythm and a clear point of view. Thoughtful coverage, beautifully edited.",items:["Wedding films","Event coverage","Commercial films","Social content","Music videos"]},
- "Drone":{description:"A different perspective for places, properties and once-in-a-lifetime moments.",items:["Aerial event coverage","Property & real estate","Land & location showcases","Custom aerial projects"]},
- "Digital Experiences":{description:"Useful, beautiful digital spaces that make your brand or occasion easier to experience.",items:["Storybook invitations","Business websites","Campaign landing pages","Custom digital projects"]},
- "Selected Work":{description:"A collection of real moments, considered frames and stories made to stay with you.",items:["Weddings & celebrations","People & portraits","Live events","Brand stories"]},
- "Storybook":{description:"A digital home for a celebration. Invitations, memories, venue information and the details guests need, brought together in one beautiful experience.",items:["Interactive invitations","RSVP and guest details","Venue and programme","Memories and galleries"]},
- "Portraits & People":{description:"People first. Portraits with personality, presence and a little room to be yourself.",items:["Personal portraits","Couples","Creative portraits","Brand portraits"]},
- "Events & Brands":{description:"The energy, atmosphere and details that make an event or brand worth remembering.",items:["Live events","Launches & activations","Corporate coverage","Brand campaigns"]}
+const configs={
+ Photography:{intro:"Photography for weddings, portraits, events and commercial stories.",tiers:[["Lite","$30","15 edited photographs"],["Plus","$50","30 edited photographs"],["Director's","$80","50 edited photographs"],["Custom","Quote required","A tailored photography brief"]]},
+ Videography:{intro:"Films, event coverage, reels and visual stories.",tiers:[["Lite","Quote required","1 hour coverage · 3–5 minute highlight"],["Plus","Quote required","2 hours coverage"],["Director's","Quote required","Extended coverage · confirm brief"],["Custom","Quote required","A tailored video production"]]},
+ Storybook:{intro:"A digital home for an occasion, with invitations, programme and memories.",tiers:[["Lite","$30","Home / RSVP, programme and memories"],["Plus","Quote required","Dashboard control and venue information"],["Director's","Quote required","Advanced guest features and notifications"],["Custom","Quote required","A tailored digital experience"]]},
+ Drone:{intro:"Aerial footage for properties, events and locations.",tiers:[["Lite","$40","Drone video service"],["Plus","Quote required","Extended aerial coverage"],["Director's","Quote required","Aerial production package"],["Custom","Quote required","Custom flight and production brief"]]},
+ Reels:{intro:"Short-form social and promotional video.",tiers:[["Lite","$40","30-second reel"],["Plus","$50","30-second product advert"],["Director's","$70","2-minute short documentary"],["Custom","Quote required","Bespoke short-form production"]]},
+ "Event Package":{intro:"Combined wedding photography and videography packages.",tiers:[["Lite","Price to confirm","4 hours · 120 photos · Reel · Online gallery"],["Plus","Price to confirm","8 hours · 250 photos · 3-minute video · Online gallery + USB"],["Director's","Price to confirm","450 photos · 12-minute video · Gallery + USB · Storybook site · 3 A0 canvases · coverage hours to confirm"],["Custom","Quote required","Build a package around your event"]]}
 };
-const modal=document.querySelector("#service-modal");
-const title=document.querySelector("#modal-title");
-const desc=document.querySelector("#modal-description");
-const cats=document.querySelector("#modal-categories");
-const world=document.querySelector("#spatial-world");
-let activeTile=null;
-function openService(name,tile){
- const item=serviceData[name];if(!item)return;
- if(activeTile)activeTile.classList.remove("is-selected");
- activeTile=tile||null;if(activeTile)activeTile.classList.add("is-selected");
- title.textContent=name;desc.textContent=item.description;
- cats.innerHTML=item.items.map((x,i)=>'<div class="category"><span>'+String(i+1).padStart(2,"0")+'</span><b>'+x+'</b><i>↗</i></div>').join("");
- modal.classList.add("open");modal.setAttribute("aria-hidden","false");
- document.body.classList.add("modal-open");modal.querySelector(".modal-close").focus();
-}
-function closeService(){
- modal.classList.remove("open");modal.setAttribute("aria-hidden","true");
- document.body.classList.remove("modal-open");
- if(activeTile)activeTile.classList.remove("is-selected");activeTile=null;
-}
-document.querySelectorAll("[data-service]").forEach(tile=>tile.addEventListener("click",()=>openService(tile.dataset.service,tile)));
-document.querySelector(".modal-close").addEventListener("click",closeService);
-modal.querySelector(".modal-shade").addEventListener("click",closeService);
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeService();});
-document.querySelector(".menu-toggle").addEventListener("click",()=>document.querySelector(".topbar").classList.toggle("menu-open"));
-document.querySelectorAll(".topbar nav a").forEach(a=>a.addEventListener("click",()=>document.querySelector(".topbar").classList.remove("menu-open")));
-const worldEl=document.querySelector("#spatial-world");
-if(worldEl){
- const updateCamera=()=>{
-  worldEl.style.setProperty("--scroll-camera-y",(-window.scrollY).toFixed(1)+"px");
- };
- window.addEventListener("scroll",updateCamera,{passive:true});
- window.addEventListener("resize",updateCamera,{passive:true});
- updateCamera();
-}
-const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
- if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target);}
-}),{threshold:.12});
-document.querySelectorAll(".section,.manifesto,.work").forEach(el=>observer.observe(el));
+const panel=document.querySelector("#info-panel"),backdrop=document.querySelector("#panel-backdrop"),content=document.querySelector("#panel-content"),panelTitle=document.querySelector("#panel-title"),dock=document.querySelector("#quote-dock");
+const basket=[];let currentService="Photography",currentTier=0,dirty=false,toastTimer;
+const money=v=>v==null?"Quote required":v;
+function notify(msg){const t=document.querySelector("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2200)}
+function priceNumber(s){const m=String(s).match(/\$(\d+(?:\.\d+)?)/);return m?Number(m[1]):null}
+function total(){return basket.reduce((n,x)=>n+(x.amount||0),0)}
+function updateBasket(){const count=basket.length;document.querySelector("#basket-count").textContent=count;document.querySelector("#floating-count").textContent=count;document.querySelector("#quote-total").textContent=count?"$"+total().toFixed(2).replace(/\.00$/,""):"$0";document.querySelector("#basket-preview").textContent=count?basket.map(x=>x.summary).join("  ·  "):"Your quote is empty";document.querySelector("#floating-quote").hidden=!count;dock.hidden=!["Photography","Videography","Storybook","Drone","Reels","Event Package","Get a Quote"].includes(panelTitle.textContent)}
+function openPanel(name){if(panel.classList.contains("open")&&dirty&&!confirm("You have enquiry details in progress. Switch panels and discard them?"))return;dirty=false;currentService=name;panelTitle.textContent=name;content.innerHTML="";dock.hidden=true;
+ if(configs[name])renderService(name);else if(name==="Get a Quote")renderQuoteForm();else if(name==="About Us")renderAbout();else if(name==="Social Media")renderSocial();
+ panel.classList.add("open");backdrop.classList.add("open");panel.setAttribute("aria-hidden","false");backdrop.setAttribute("aria-hidden","false");document.body.classList.add("panel-open");}
+function closePanel(){panel.classList.remove("open");backdrop.classList.remove("open");panel.setAttribute("aria-hidden","true");backdrop.setAttribute("aria-hidden","true");document.body.classList.remove("panel-open");dirty=false}
+function renderService(name){const cfg=configs[name];currentTier=0;content.innerHTML='<p class="panel-intro">'+cfg.intro+'</p><div class="service-choices">'+[['Photography','▧'],['Videography','▶'],['Storybook','▤'],['Drone','⌁'],['Reels','▣'],['Event Package','◇']].map(([n,i])=>'<button class="service-choice '+(n===name?'active':'')+'" data-choose-service="'+n+'"><span class="choice-icon">'+i+'</span>'+n+'</button>').join("")+'</div><div class="package-area"><div class="package-head"><b>Choose your package</b><span>PACKAGE SELECTOR</span></div><div class="package-track">'+cfg.tiers.map((t,i)=>'<button class="package-stop '+(!i?'active':'')+'" data-tier="'+i+'">'+t[0]+'</button>').join("")+'</div><div class="package-detail" id="package-detail"></div><button class="add-quote" id="add-quote">＋ Add to quote</button></div>';
+ content.querySelectorAll("[data-choose-service]").forEach(b=>b.onclick=()=>{if(dirty&&!confirm("Switch service and discard unsaved details?"))return;openPanel(b.dataset.chooseService)});
+ content.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>{currentTier=Number(b.dataset.tier);content.querySelectorAll("[data-tier]").forEach(x=>x.classList.toggle("active",x===b));renderTier()});
+ renderTier();document.querySelector("#add-quote").onclick=addCurrent;dock.hidden=false;updateBasket();}
+function renderTier(){const t=configs[currentService].tiers[currentTier];document.querySelector("#package-detail").innerHTML='<h3>'+t[0]+'</h3><div class="package-price">'+t[1]+'</div><p>'+t[2]+'</p>'}
+function addCurrent(){const t=configs[currentService].tiers[currentTier],event=currentService==="Event Package";const amount=priceNumber(t[1]);let summary=currentService+" · "+t[0]+" · "+(amount==null?"Quote required":t[1]);if(event)summary=t[0]+" Wedding Package — "+t[2];basket.push({service:currentService,tier:t[0],amount,summary,details:t[2]});updateBasket();notify("Added to your quote");}
+function renderBasket(){content.innerHTML='<p class="panel-intro">Review the services you have selected. You can remove an item before sending your enquiry.</p><div class="basket-list">'+(basket.length?basket.map((x,i)=>'<div class="basket-item"><span><b>'+x.service+' · '+x.tier+'</b><br>'+x.details+'<br>'+(x.amount==null?"Price on request":"$"+x.amount)+'</span><button data-remove="'+i+'">Remove</button></div>').join(""):"Your quote is empty.")+'</div><p><b>Estimated total: $'+total()+'</b> '+(basket.some(x=>x.amount==null)?' + items requiring a quote':'')+'</p><button class="add-quote" id="back-to-form">Continue to enquiry details</button>';content.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{basket.splice(Number(b.dataset.remove),1);updateBasket();renderBasket()});document.querySelector("#back-to-form").onclick=renderQuoteForm;dock.hidden=false}
+function renderQuoteForm(){panelTitle.textContent="Your enquiry";content.innerHTML='<p class="panel-intro">Your selected services are listed below. Add your contact details once and we will get back to you.</p><div class="basket-list">'+(basket.length?basket.map(x=>'<div class="basket-item"><span><b>'+x.service+' · '+x.tier+'</b><br>'+x.details+'</span><b>'+(x.amount==null?"Quote required":"$"+x.amount)+'</b></div>').join(""):"No package selected yet. You can still send a general enquiry.")+'</div><form class="quote-form" id="enquiry-form"><label>Full name *<input name="name" required></label><label>WhatsApp number *<input name="phone" required placeholder="+263 …"></label><label>Email address<input name="email" type="email"></label><label>Company / organisation<input name="company"></label><label>Event or project date<input name="date" type="date"></label><label>Location<input name="location"></label><label class="wide">Project details<textarea name="brief" placeholder="Tell us a little about what you need"></textarea></label></form><p class="panel-note">We use these details only to respond to your enquiry. WhatsApp opens a prepared message for you to review and send.</p><div class="submit-options"><button id="send-whatsapp">Send via WhatsApp</button><button class="email-submit" id="send-email">Send via email</button></div>';const form=document.querySelector("#enquiry-form");form.oninput=()=>dirty=true;const message=()=>{if(!form.reportValidity())return null;const f=new FormData(form);return ["VISUAL STORYTELLER — QUOTE ENQUIRY","Name: "+f.get("name"),"WhatsApp: "+f.get("phone"),"Email: "+(f.get("email")||"Not provided"),"Company: "+(f.get("company")||"Not provided"),"Date: "+(f.get("date")||"Not specified"),"Location: "+(f.get("location")||"Not specified"),"Selected items:",...basket.map(x=>"- "+x.service+" / "+x.tier+" / "+x.details+" / "+(x.amount==null?"Quote required":"$"+x.amount)),"Estimated total: $"+total(),"Brief: "+(f.get("brief")||"Not provided")].join("\n")};document.querySelector("#send-whatsapp").onclick=()=>{const m=message();if(m)window.open("https://wa.me/263783641716?text="+encodeURIComponent(m),"_blank","noopener")};document.querySelector("#send-email").onclick=()=>{const m=message();if(m){location.href="mailto:emailvstoryteller@gmail.com?subject="+encodeURIComponent("Visual Storyteller quote enquiry")+"&body="+encodeURIComponent(m)} }}
+function renderAbout(){content.innerHTML='<p class="panel-intro">Visual Storyteller is a Harare-based creative studio working across photography, videography, drone footage and digital experiences.</p><p class="panel-intro">We make considered images and films that capture people, places and moments with clarity, character and purpose. From personal celebrations to brands and businesses, our approach is thoughtful, collaborative and story-led.</p>'}
+function renderSocial(){content.innerHTML='<p class="panel-intro">Find Visual Storyteller online. Choose a channel to connect with the studio.</p><div class="social-links"><a href="https://www.youtube.com/@storytellervs" target="_blank" rel="noopener">YouTube ↗</a><a href="https://wa.me/263783641716" target="_blank" rel="noopener">WhatsApp ↗</a><a href="mailto:emailvstoryteller@gmail.com">Email ↗</a></div><p class="panel-note">Other social profiles will be added when their official links are confirmed.</p>'}
+document.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>openPanel(b.dataset.panel)));
+document.querySelector(".panel-close").onclick=closePanel;
+document.querySelector("#basket-open").onclick=()=>{panelTitle.textContent="Your quote";renderBasket()};
+document.querySelector("#total-open").onclick=()=>{panelTitle.textContent="Your quote";renderBasket()};
+document.querySelector("#quote-submit").onclick=()=>{if(!basket.length){notify("Add a service to your quote first");return}renderQuoteForm()};
+document.querySelector("#floating-quote-open").onclick=()=>{openPanel("Get a Quote");renderBasket();panelTitle.textContent="Your quote"};
+document.querySelectorAll(".spatial-tile").forEach(tile=>tile.addEventListener("click",()=>openPanel(tile.dataset.service==="Digital Experiences"?"Storybook":tile.dataset.service==="Events & Brands"?"Event Package":tile.dataset.service==="Selected Work"?"Photography":tile.dataset.service==="Portraits & People"?"Photography":tile.dataset.service==="Videography"?"Videography":tile.dataset.service)));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&panel.classList.contains("open")){/* X is the only dismissal control */}});
+const world=document.querySelector("#spatial-world");if(world){const update=()=>world.style.setProperty("--scroll-camera-y",(-window.scrollY).toFixed(1)+"px");window.addEventListener("scroll",update,{passive:true});window.addEventListener("resize",update);update()}
+updateBasket();
