@@ -116,6 +116,33 @@ export default {
         .bind(id,title,category,String(body.description || "").slice(0,4000),String(body.location || "").slice(0,200),body.project_date || null,body.cover_key || null,body.status === "published" ? "published" : "draft",Number.isInteger(body.sort_order) ? body.sort_order : 0).run();
       return response({ id, created: true }, request, env, 201);
     }
+    if (url.pathname.startsWith("/api/projects/") && url.pathname.endsWith("/media")) {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const id = url.pathname.slice("/api/projects/".length, -"/media".length);
+      const project = await env.db.prepare("SELECT id FROM projects WHERE id=?").bind(id).first();
+      if (!project) return response({ error: "Project not found" }, request, env, 404);
+      if (request.method === "GET") {
+        const rows = await env.db.prepare("SELECT id,object_key,media_type,alt_text,sort_order FROM project_media WHERE project_id=? ORDER BY sort_order ASC,created_at ASC").bind(id).all();
+        return response({ media: rows.results || [] }, request, env);
+      }
+      if (request.method === "POST") {
+        const body = await request.json().catch(() => null);
+        const keys = Array.isArray(body?.media) ? body.media : [];
+        if (keys.length > 100) return response({ error: "A project can contain at most 100 media items" }, request, env, 400);
+        await env.db.prepare("DELETE FROM project_media WHERE project_id=?").bind(id).run();
+        for (let i=0;i<keys.length;i++) {
+          const item=keys[i], key=safeKey(item?.key);
+          if (!key) continue;
+          const object=await env.MEDIA.head(key);
+          if (!object) continue;
+          const type=String(item.type||object.httpMetadata?.contentType||"").startsWith("video/")?"video":"image";
+          await env.db.prepare("INSERT INTO project_media (id,project_id,object_key,media_type,alt_text,sort_order) VALUES (?,?,?,?,?,?)")
+            .bind(crypto.randomUUID(),id,key,type,String(item.alt_text||"").slice(0,300),i).run();
+        }
+        return response({ saved: true, count: keys.length }, request, env);
+      }
+    }
+
     if (url.pathname.startsWith("/api/projects/")) {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const id = url.pathname.slice("/api/projects/".length);
