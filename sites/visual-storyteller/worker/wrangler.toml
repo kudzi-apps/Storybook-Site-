@@ -14,4 +14,4 @@ database_id = "20fabd95-1953-42b6-9151-82676a8d2f10"
 migrations_dir = "migrations"
 
 [vars]
-ALLOWED_ORIGINS = "https://visual-story-teller.pages.dev"
+ALLOWED_ORIGINS = "https://visual-storyteller.pages.dev"
