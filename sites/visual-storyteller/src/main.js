@@ -137,13 +137,43 @@ document.addEventListener("keydown",function(event){if(event.key==="Escape"&&pan
 const world=document.querySelector("#spatial-world");
 const gallerySource=document.querySelector("#spatial-source");
 if(world&&gallerySource){
- gallerySource.classList.add("gallery-ready");
- gallerySource.querySelectorAll(".spatial-tile").forEach((tile,index)=>{
-  tile.classList.add("drift-tile");
-  tile.removeAttribute("style");
-  tile.style.setProperty("--tilt",((index%5)-2)*.45+"deg");
- });
- world.addEventListener("pointerdown",()=>{world.classList.add("gallery-paused");setTimeout(()=>world.classList.remove("gallery-paused"),1800);});
+ const originals=Array.from(gallerySource.querySelectorAll(":scope > .spatial-tile"));
+ const media=window.matchMedia("(max-width:700px)");
+ function makeDriftingColumns(){
+  gallerySource.innerHTML="";
+  const count=media.matches?3:5;
+  const tracks=Array.from({length:count},(_,i)=>{
+   const column=document.createElement("div");
+   column.className="spatial-column depth-"+(i%3);
+   const track=document.createElement("div");track.className="spatial-track";
+   column.appendChild(track);gallerySource.appendChild(column);return track;
+  });
+  originals.forEach((tile,index)=>{
+   tile.classList.add("drift-tile");
+   tile.removeAttribute("style");
+   tile.style.setProperty("--tilt",((index%5)-2)*.55+"deg");
+   tracks[index%count].appendChild(tile);
+  });
+  tracks.forEach((track,index)=>{
+   const firstSet=Array.from(track.children);
+   firstSet.forEach(tile=>{
+    const clone=tile.cloneNode(true);
+    clone.setAttribute("aria-hidden","true");clone.tabIndex=-1;
+    clone.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
+    track.appendChild(clone);
+   });
+   track.style.setProperty("--drift-duration",(media.matches?76:64)+index*(media.matches?9:8)+"s");
+   track.style.setProperty("--drift-delay",(-index*8)+"s");
+  });
+ }
+ makeDriftingColumns();
+ let resizeTimer;
+ window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(makeDriftingColumns,220);},{passive:true});
+ world.addEventListener("pointerdown",()=>{world.classList.add("gallery-paused");setTimeout(()=>world.classList.remove("gallery-paused"),1600);});
+ world.addEventListener("focusin",()=>world.classList.add("gallery-paused"));
+ world.addEventListener("focusout",event=>{if(!world.contains(event.relatedTarget))world.classList.remove("gallery-paused");});
+ world.addEventListener("touchstart",()=>world.classList.add("gallery-paused"),{passive:true});
+ world.addEventListener("touchend",()=>setTimeout(()=>world.classList.remove("gallery-paused"),1300),{passive:true});
 }
 updateBasket();
 
