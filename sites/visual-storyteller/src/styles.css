@@ -594,3 +594,8 @@ footer{position:fixed!important;left:0!important;right:0!important;bottom:0!impo
 .toast{position:fixed;z-index:150;left:50%;bottom:110px;transform:translate(-50%,12px);opacity:0;visibility:hidden;background:#f2f2f2;color:#111;padding:11px 18px;border-radius:30px;font-size:12px;transition:.2s}.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
 body.panel-open{overflow:hidden}
 @media(max-width:650px){.topbar nav{display:flex;position:static;flex:1;justify-content:flex-end;background:none;border:0;padding:0;gap:0}.topbar nav button{font-size:10px;padding:10px 7px}.topbar .brand{flex:0 0 90px;min-width:90px}.topbar .menu-toggle{display:none}.bottom-nav button{padding:8px 3px;font-size:10px}.info-panel{top:80px;bottom:82px;width:calc(100vw - 20px);border-radius:15px}.panel-scroll{padding:32px 17px 18px}.panel-scroll h2{font-size:37px}.service-choices{gap:7px}.service-choice{min-height:68px;font-size:10px}.package-stop{font-size:9px;padding:10px 2px}.quote-dock{padding:10px 11px 12px}.quote-controls{gap:6px}.quote-control{height:58px;padding:5px 2px}.submit-control{font-size:10px}.total-control strong{font-size:17px}.quote-form{grid-template-columns:1fr}.quote-form .wide{grid-column:auto}.floating-quote{right:12px;bottom:88px}.panel-close{right:10px;top:9px;width:36px;height:36px}}
+
+/* Keep the fixed navigation bars outside the panel dimmer */
+.panel-backdrop{inset:96px 0 96px;z-index:90}
+.topbar,footer.bottom-nav{z-index:100!important}
+@media(max-width:650px){.panel-backdrop{inset:76px 0 78px}.info-panel{top:80px;bottom:82px}}
