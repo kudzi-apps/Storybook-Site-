@@ -15,7 +15,7 @@ function priceNumber(s){const m=String(s).match(/\$(\d+(?:\.\d+)?)/);return m?Nu
 function total(){return basket.reduce((n,x)=>n+(x.amount||0),0)}
 function updateBasket(){const count=basket.length;document.querySelector("#basket-count").textContent=count;document.querySelector("#floating-count").textContent=count;document.querySelector("#quote-total").textContent=count?"$"+total().toFixed(2).replace(/\.00$/,""):"$0";document.querySelector("#basket-preview").textContent=count?basket.map(x=>x.summary).join("  ·  "):"Your quote is empty";document.querySelector("#floating-quote").hidden=!count;dock.hidden=!["Photography","Videography","Storybook","Drone","Reels","Event Package","Get a Quote"].includes(panelTitle.textContent)}
 function openPanel(name){if(panel.classList.contains("open")&&dirty&&!confirm("You have enquiry details in progress. Switch panels and discard them?"))return;dirty=false;currentService=name;panelTitle.textContent=name;content.innerHTML="";dock.hidden=true;
- if(configs[name])renderService(name);else if(name==="Get a Quote")renderQuoteBuilder();else if(name==="About Us")renderAbout();else if(name==="Social Media")renderSocial();else if(name==="FAQ")renderFAQ();else if(name==="Terms & Conditions")renderTerms();
+ if(["Photography","Videography","Storybook"].includes(name))renderPortfolio(name);else if(configs[name])renderService(name);else if(name==="Get a Quote")renderQuoteBuilder();else if(name==="About Us")renderAbout();else if(name==="Social Media")renderSocial();else if(name==="FAQ")renderFAQ();else if(name==="Terms & Conditions")renderTerms();
  panel.classList.add("open");backdrop.classList.add("open");panel.setAttribute("aria-hidden","false");backdrop.setAttribute("aria-hidden","false");document.body.classList.add("panel-open");}
 function closePanel(){panel.classList.remove("open");backdrop.classList.remove("open");panel.setAttribute("aria-hidden","true");backdrop.setAttribute("aria-hidden","true");document.body.classList.remove("panel-open");dirty=false}
 
@@ -57,6 +57,23 @@ function renderQuoteBuilder(){
  document.querySelector("#add-configured-service").onclick=function(){const n=quoteQuantities[quoteService],p=quoteServicePrice(quoteService,n),m=quoteSliderMeta(quoteService),detail=m.label+": "+n+" "+m.unit;basket.push({service:quoteService,tier:quoteService==="Event Package"?"Event":"Selected",amount:p,summary:quoteService+" · "+detail,details:detail,quantity:n});updateBasket();notify("Added to your quote");};
  document.querySelector("#quote-continue").onclick=renderQuoteForm;
  updateBasket();
+}
+async function renderPortfolio(category){
+ dock.hidden=true;
+ content.innerHTML='<p class="panel-intro">Selected '+category.toLowerCase()+' projects by Visual Storyteller.</p><div class="portfolio-loading">Loading selected projects…</div>';
+ try{
+  const res=await fetch("https://visual-storyteller-media-api.kudzaimagigi99.workers.dev/api/public/projects");
+  if(!res.ok)throw new Error("Portfolio is temporarily unavailable.");
+  const data=await res.json(),items=(data.projects||[]).filter(p=>p.category===category);
+  if(!items.length){content.innerHTML='<p class="panel-intro">Selected '+category.toLowerCase()+' projects by Visual Storyteller.</p><div class="portfolio-empty"><h3>New work is being prepared.</h3><p>Check back soon for selected projects.</p></div>';return;}
+  content.innerHTML='<p class="panel-intro">Selected '+category.toLowerCase()+' projects by Visual Storyteller.</p><div class="portfolio-grid">'+items.map((p,i)=>'<button class="portfolio-card size-'+(i%5)+'" data-project="'+i+'">'+(p.cover_key?'<img loading="lazy" src="https://visual-storyteller-media-api.kudzaimagigi99.workers.dev/api/public/media/'+encodeURIComponent(p.cover_key)+'" alt="'+escapePortfolio(p.title)+'">':'<span class="portfolio-placeholder">VS / '+category.toUpperCase()+'</span>')+'<span class="portfolio-caption"><b>'+escapePortfolio(p.title)+'</b><small>'+escapePortfolio(p.location||category)+'</small></span></button>').join("")+'</div>';
+  content.querySelectorAll("[data-project]").forEach(b=>b.onclick=()=>renderPortfolioDetail(items[Number(b.dataset.project)],category));
+ }catch(e){content.innerHTML='<p class="panel-intro">Selected '+category.toLowerCase()+' projects by Visual Storyteller.</p><div class="portfolio-empty"><h3>Portfolio connection pending.</h3><p>'+escapePortfolio(e.message)+'</p></div>';}
+}
+function escapePortfolio(value){return String(value||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function renderPortfolioDetail(project,category){
+ content.innerHTML='<button class="portfolio-back" id="portfolio-back">← All '+category+' projects</button>'+(project.cover_key?'<img class="portfolio-detail-image" src="https://visual-story-teller-media-api.kudzaimagigi99.workers.dev/api/public/media/'+encodeURIComponent(project.cover_key)+'" alt="'+escapePortfolio(project.title)+'">':'')+'<div class="portfolio-detail-copy"><span class="eyebrow">'+escapePortfolio(category)+'</span><h2>'+escapePortfolio(project.title)+'</h2><p>'+escapePortfolio(project.description||"")+'</p><small>'+escapePortfolio(project.location||"")+'</small></div>';
+ $("#portfolio-back").onclick=()=>renderPortfolio(category);
 }
 function renderService(name){
  const cfg=configs[name];currentTier=0;
