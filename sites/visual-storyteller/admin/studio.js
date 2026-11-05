@@ -89,22 +89,6 @@ function putWithProgress(url,file,ui){
   xhr.send(file);
  });
 }
-async function uploadFiles(files,folder="uploads",queueSelector="#upload-queue"){
- const valid=files.filter(f=>f.type.startsWith("image/")||f.type.startsWith("video/"));
- if(!valid.length)return;
- $(queueSelector).replaceChildren();
- const errors=[];
- for(let i=0;i<valid.length;i++){
-  const file=valid[i],ui=uploadProgress(file,i,valid.length);$(queueSelector).append(ui.row);
-  try{
-   const init=await api("/api/media",{method:"POST",body:JSON.stringify({filename:file.name,folder:folder})});
-   ui.state.textContent="Uploading…";
-   await putWithProgress(init.uploadUrl,file,ui);
-  }catch(err){errors.push(err.message);ui.state.textContent="Failed";ui.row.classList.add("failed");}
- }
- await loadMedia();
- if(errors.length)alert(errors.join("\\n"));
-}
 const palette=[{name:"Charcoal",value:"#17191c"},{name:"Pastel red",value:"#e9b7b5"},{name:"Brand red",value:"#d9363e"},{name:"Soft white",value:"#f1f1f1"},{name:"Pastel green",value:"#bfd6c4"},{name:"Brand green",value:"#4b8b62"}];
 function hexRgba(hex,alpha){const n=parseInt(hex.slice(1),16);return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+alpha+")";}
 function selectedPalette(v){return palette[Math.max(0,Math.min(palette.length-1,Math.round(Number(v)/20)))];}
