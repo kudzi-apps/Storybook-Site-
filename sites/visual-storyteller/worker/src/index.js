@@ -83,11 +83,10 @@ export default {
       }).sort((a,b) => new Date(b.uploaded) - new Date(a.uploaded))
         .map(object => {
           const encoded = object.key.split("/").map(encodeURIComponent).join("/");
-          const thumbKey = "thumbs/" + object.key;
           return {
             key: object.key,
             url: "/api/public/media/" + encoded,
-            thumbUrl: "/api/public/media/" + thumbKey.split("/").map(encodeURIComponent).join("/"),
+            thumbUrl: "/api/public/media/" + encoded,
             uploaded: object.uploaded,
             size: object.size
           };
