@@ -17,7 +17,7 @@ function populateBackgroundPicker(){const select=$("#background-image-select");i
 function renderMedia(){if(!media.length){$("#media-list").innerHTML='<div class="empty-state compact"><span>▧</span><h2>Your library is empty</h2><p>Upload your first images or videos.</p></div>';return;}$("#media-list").innerHTML='<div class="media-grid">'+media.map((m,i)=>'<article class="media-item" data-media="'+i+'"><div class="media-thumb" id="thumb-'+i+'">'+(String(m.contentType||"").startsWith("image/")?"Loading preview…":"MEDIA FILE")+'</div><b>'+escapeHtml(m.key.split("/").pop())+'</b><small>'+formatBytes(m.size)+'</small></article>').join("")+'</div>';media.forEach(async(m,i)=>{if(!String(m.contentType||"").startsWith("image/"))return;try{const blob=await api("/api/media/"+m.key.split("/").map(encodeURIComponent).join("/"),{expectBlob:true});const img=document.createElement("img");img.src=URL.createObjectURL(blob);img.alt="";$("#thumb-"+i).replaceChildren(img);}catch{}});}
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function formatBytes(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":(n/1048576).toFixed(1)+" MB";}
-function uploadProgress(file,index,total){
+function uploadProgress(file,index,total,queueSelector="#upload-queue"){
  const row=document.createElement("div");row.className="upload-row";
  const top=document.createElement("div");top.className="upload-row-top";
  const name=document.createElement("span");name.className="upload-name";name.textContent=file.name;
@@ -25,8 +25,59 @@ function uploadProgress(file,index,total){
  const track=document.createElement("div");track.className="upload-track";
  const bar=document.createElement("span");bar.className="upload-bar";track.append(bar);
  const detail=document.createElement("small");detail.className="upload-detail";detail.textContent=formatBytes(file.size)+" · "+(index+1)+" of "+total;
- top.append(name,state);row.append(top,track,detail);$("#upload-queue").append(row);
+ top.append(name,state);row.append(top,track,detail);$(queueSelector).append(row);
  return {row,state,bar,detail};
+}
+function canvasBlob(canvas,type,quality){
+ return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not create an optimized image.")),type,quality));
+}
+async function optimizePhoto(file,maxEdge){
+ let bitmap;
+ try{bitmap=await createImageBitmap(file);}catch{throw new Error(file.name+" could not be opened by the browser. Export it as JPEG first if it is a RAW or unsupported camera file.");}
+ try{
+  const scale=Math.min(1,maxEdge/Math.max(bitmap.width,bitmap.height));
+  const width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,width,height);ctx.drawImage(bitmap,0,0,width,height);
+  const main=await canvasBlob(canvas,"image/webp",0.84);
+  if(main.type!=="image/webp")throw new Error("This browser cannot create WebP images. Please use Chrome or Edge.");
+  const thumbScale=Math.min(1,400/Math.max(width,height));
+  const thumbCanvas=document.createElement("canvas");thumbCanvas.width=Math.max(1,Math.round(width*thumbScale));thumbCanvas.height=Math.max(1,Math.round(height*thumbScale));
+  thumbCanvas.getContext("2d",{alpha:false}).drawImage(canvas,0,0,thumbCanvas.width,thumbCanvas.height);
+  const thumb=await canvasBlob(thumbCanvas,"image/webp",0.78);
+  return {main,thumb,width,height};
+ }finally{bitmap.close?.();}
+}
+async function uploadFiles(files,folder="uploads",queueSelector="#upload-queue"){
+ const valid=files.filter(f=>f.type.startsWith("image/")||f.type.startsWith("video/"));
+ if(!valid.length)return;
+ $(queueSelector).replaceChildren();
+ const errors=[];
+ for(let i=0;i<valid.length;i++){
+  const file=valid[i],ui=uploadProgress(file,i,valid.length,queueSelector);
+  try{
+   if(file.type.startsWith("image/")){
+    ui.state.textContent="Optimizing…";
+    const optimized=await optimizePhoto(file,folder==="gallery"?1600:2000);
+    const base=file.name.replace(/\.[^.]+$/,"").replace(/[^a-zA-Z0-9._-]+/g,"-")||"photo";
+    const filename=base+".webp";
+    ui.detail.textContent=optimized.width+" × "+optimized.height+" · "+formatBytes(optimized.main.size)+" web copy";
+    const init=await api("/api/media",{method:"POST",body:JSON.stringify({filename,folder})});
+    ui.state.textContent="Uploading web copy…";
+    await putWithProgress(init.uploadUrl,optimized.main,ui);
+    const thumbInit=await api("/api/media",{method:"POST",body:JSON.stringify({filename:"thumbnail.webp",folder:"thumbs",key:"thumbs/"+init.key})});
+    ui.state.textContent="Uploading thumbnail…";
+    await putWithProgress(thumbInit.uploadUrl,optimized.thumb,ui);
+    ui.state.textContent="Done";ui.bar.style.width="100%";
+    ui.detail.textContent=formatBytes(file.size)+" original → "+formatBytes(optimized.main.size)+" web + "+formatBytes(optimized.thumb.size)+" thumbnail";
+   }else{
+    const init=await api("/api/media",{method:"POST",body:JSON.stringify({filename:file.name,folder})});
+    ui.state.textContent="Uploading video…";await putWithProgress(init.uploadUrl,file,ui);ui.state.textContent="Done";
+   }
+  }catch(err){errors.push(err.message);ui.state.textContent="Failed";ui.row.classList.add("failed");}
+ }
+ await loadMedia();
+ if(errors.length)alert(errors.join("\n"));
 }
 function putWithProgress(url,file,ui){
  return new Promise((resolve,reject)=>{
