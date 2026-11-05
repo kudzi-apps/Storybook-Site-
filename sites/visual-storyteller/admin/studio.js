@@ -31,14 +31,26 @@ function uploadProgress(file,index,total,queueSelector="#upload-queue"){
 function canvasBlob(canvas,type,quality){
  return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not create an optimized image.")),type,quality));
 }
+async function decodePhoto(file){
+ try{return await createImageBitmap(file);}catch(bitmapError){
+  const url=URL.createObjectURL(file);
+  try{
+   const image=new Image();image.decoding="async";image.src=url;
+   if(image.decode)await image.decode();else await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;});
+   if(!image.naturalWidth||!image.naturalHeight)throw new Error("Image has no readable dimensions.");
+   return {width:image.naturalWidth,height:image.naturalHeight,drawTo:ctx=>ctx.drawImage(image,0,0),close:()=>{}};
+  }catch(imageError){throw new Error(file.name+" could not be decoded. Try opening it on your PC and exporting a fresh JPEG.");}
+  finally{URL.revokeObjectURL(url);}
+ }
+}
 async function optimizePhoto(file,maxEdge){
- let bitmap;
- try{bitmap=await createImageBitmap(file);}catch{throw new Error(file.name+" could not be opened by the browser. Export it as JPEG first if it is a RAW or unsupported camera file.");}
+ const bitmap=await decodePhoto(file);
  try{
   const scale=Math.min(1,maxEdge/Math.max(bitmap.width,bitmap.height));
   const width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
   const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
-  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,width,height);ctx.drawImage(bitmap,0,0,width,height);
+  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,width,height);
+  if(bitmap.drawTo)bitmap.drawTo(ctx);else ctx.drawImage(bitmap,0,0,width,height);
   const main=await canvasBlob(canvas,"image/webp",0.84);
   if(main.type!=="image/webp")throw new Error("This browser cannot create WebP images. Please use Chrome or Edge.");
   const thumbScale=Math.min(1,400/Math.max(width,height));
