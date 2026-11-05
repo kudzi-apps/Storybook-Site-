@@ -138,6 +138,9 @@ const world=document.querySelector("#spatial-world");
 const gallerySource=document.querySelector("#spatial-source");
 async function loadProjectGallery(){
  if(!gallerySource)return;
+ // Temporarily keep the homepage gallery empty while the new optimized photo set is prepared.
+ gallerySource.replaceChildren();
+ return;
  try{
   const apiBase="https://visual-storyteller-media-api.kudzaimagigi99.workers.dev";
   const responses=await Promise.all([fetch(apiBase+"/api/public/gallery"),fetch(apiBase+"/api/public/projects")]);
