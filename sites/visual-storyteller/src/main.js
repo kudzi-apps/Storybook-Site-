@@ -146,7 +146,7 @@ async function loadProjectGallery(){
   if(responses[0].ok){
    const uploaded=await responses[0].json();
    (uploaded.images||[]).forEach(image=>{
-    if(image.key&&!seen.has(image.key)){seen.add(image.key);items.push({url:apiBase+(image.thumbUrl||image.url),title:"Visual Storyteller",service:"Photography"});}
+    if(image.key&&!seen.has(image.key)){seen.add(image.key);items.push({url:apiBase+image.url,title:"Visual Storyteller",service:"Photography"});}
    });
   }
   if(responses[1].ok){
