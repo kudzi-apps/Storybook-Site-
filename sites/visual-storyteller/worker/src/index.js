@@ -73,6 +73,22 @@ export default {
         schema: schemaReady
       }, request, env, ok ? 200 : 503);
     }
+    if (url.pathname === "/api/public/gallery" && request.method === "GET") {
+      if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
+      const listed = await env.MEDIA.list({ prefix: "uploads/", limit: 1000 });
+      const images = (listed.objects || []).filter(object => {
+        const key = object.key.toLowerCase();
+        return /\\.(jpe?g|png|webp|gif|avif)$/i.test(key);
+      }).sort((a,b) => new Date(b.uploaded) - new Date(a.uploaded))
+        .map(object => ({
+          key: object.key,
+          url: "/api/public/media/" + object.key.split("/").map(encodeURIComponent).join("/"),
+          uploaded: object.uploaded,
+          size: object.size
+        }));
+      return response({ images }, request, env, 200, { "cache-control": "public, max-age=60" });
+    }
+
     if (url.pathname.startsWith("/api/public/media/") && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
       const key = safeKey(decodeURIComponent(url.pathname.slice("/api/public/media/".length)));
