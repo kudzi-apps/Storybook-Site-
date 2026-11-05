@@ -33,14 +33,22 @@ function canvasBlob(canvas,type,quality){
 }
 async function decodePhoto(file){
  try{return await createImageBitmap(file);}catch(bitmapError){
-  const url=URL.createObjectURL(file);
   try{
-   const image=new Image();image.decoding="async";image.src=url;
-   if(image.decode)await image.decode();else await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;});
+   const dataUrl=await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(new Error("Could not read selected file."));
+    reader.readAsDataURL(file);
+   });
+   const image=new Image();
+   await new Promise((resolve,reject)=>{
+    image.onload=resolve;
+    image.onerror=()=>reject(new Error("Browser image loader rejected the file."));
+    image.src=dataUrl;
+   });
    if(!image.naturalWidth||!image.naturalHeight)throw new Error("Image has no readable dimensions.");
-   return {width:image.naturalWidth,height:image.naturalHeight,drawTo:ctx=>ctx.drawImage(image,0,0),close:()=>{}};
-  }catch(imageError){throw new Error(file.name+" could not be decoded. Try opening it on your PC and exporting a fresh JPEG.");}
-  finally{URL.revokeObjectURL(url);}
+   return {width:image.naturalWidth,height:image.naturalHeight,drawTo:ctx=>ctx.drawImage(image,0,0),close:()=>{image.src="";}};
+  }catch(imageError){throw new Error(file.name+" could not be decoded by this browser. The file itself may still be valid; try another browser or export a fresh JPEG.");}
  }
 }
 async function optimizePhoto(file,maxEdge){
