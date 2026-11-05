@@ -79,7 +79,7 @@ export default {
       const objects = listings.flatMap(listed => listed.objects || []);
       const images = objects.filter(object => {
         const key = object.key.toLowerCase();
-        return /\\.(jpe?g|png|webp|gif|avif)$/i.test(key);
+        return /\.(jpe?g|png|webp|gif|avif)$/i.test(key);
       }).sort((a,b) => new Date(b.uploaded) - new Date(a.uploaded))
         .map(object => ({
           key: object.key,
