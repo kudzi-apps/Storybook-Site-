@@ -55,7 +55,7 @@ async function uploadFiles(files,folder="uploads",queueSelector="#upload-queue")
   }catch(err){errors.push(err.message);ui.state.textContent="Failed";ui.row.classList.add("failed");}
  }
  await loadMedia();
- if(errors.length)alert(errors.join("\\n"));
+ if(errors.length)alert(errors.join("\n"));
 }
 function putWithProgress(url,file,ui,contentType=mediaContentType(file)){
  return new Promise((resolve,reject)=>{
