@@ -30,7 +30,7 @@ function uploadProgress(file,index,total){
 }
 function putWithProgress(url,file,ui){
  return new Promise((resolve,reject)=>{
-  const xhr=new XMLHttpRequest();const target=new URL(url,API).href;xhr.open("PUT",target);xhr.setRequestHeader("content-type",file.type||"application/octet-stream");
+  const xhr=new XMLHttpRequest();const target=new URL(url,API).href;xhr.open("PUT",target);xhr.setRequestHeader("authorization","Bearer "+token);xhr.setRequestHeader("content-type",file.type||"application/octet-stream");
   xhr.upload.onprogress=e=>{if(e.lengthComputable){const pct=Math.round(e.loaded/e.total*100);ui.bar.style.width=pct+"%";ui.state.textContent=pct+"%";ui.detail.textContent=formatBytes(e.loaded)+" of "+formatBytes(e.total);}};
   xhr.onload=()=>{if(xhr.status>=200&&xhr.status<300){ui.bar.style.width="100%";ui.state.textContent="Uploaded";ui.row.classList.add("complete");resolve();}else{ui.state.textContent="Failed";ui.detail.textContent="Upload failed ("+xhr.status+")";ui.row.classList.add("failed");reject(new Error("Upload failed for "+file.name+" ("+xhr.status+")"));}};
   xhr.onerror=()=>{ui.state.textContent="Failed";ui.detail.textContent="Network error";ui.row.classList.add("failed");reject(new Error("Network error uploading "+file.name));};
