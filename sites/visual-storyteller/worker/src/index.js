@@ -221,6 +221,34 @@ export default {
       return response({ published: true, revision: id, projectCount: count }, request, env);
     }
 
+    if (url.pathname === "/api/media/bulk-delete" && request.method === "POST") {
+      if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
+      const body = await request.json().catch(() => null);
+      if (!body || (body.all !== true && !Array.isArray(body.keys))) return response({ error: "Provide keys or set all=true" }, request, env, 400);
+      let keys = [];
+      if (body.all === true) {
+        let cursor;
+        do {
+          const listed = await env.MEDIA.list({ limit: 1000, ...(cursor ? { cursor } : {}) });
+          keys.push(...(listed.objects || []).filter(object => !object.key.startsWith("thumbs/")).map(object => object.key));
+          cursor = listed.truncated ? listed.cursor : undefined;
+        } while (cursor);
+      } else {
+        if (body.keys.length > 1000) return response({ error: "Delete at most 1000 marked files at a time" }, request, env, 400);
+        keys = [...new Set(body.keys.map(safeKey).filter(Boolean))];
+      }
+      let deleted = 0;
+      for (const key of keys) {
+        await env.MEDIA.delete(key);
+        if (env.db) {
+          await env.db.prepare("DELETE FROM project_media WHERE object_key=?").bind(key).run();
+          await env.db.prepare("UPDATE projects SET cover_key=NULL,updated_at=datetime('now') WHERE cover_key=?").bind(key).run();
+        }
+        deleted++;
+      }
+      return response({ deleted }, request, env);
+    }
+
     if (url.pathname === "/api/media" && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
       const prefix = url.searchParams.get("prefix") || "";
