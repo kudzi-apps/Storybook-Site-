@@ -140,20 +140,27 @@ async function loadProjectGallery(){
  if(!gallerySource)return;
  try{
   const apiBase="https://visual-storyteller-media-api.kudzaimagigi99.workers.dev";
-  const response=await fetch(apiBase+"/api/public/projects");
-  if(!response.ok)throw new Error("Project gallery unavailable");
-  const data=await response.json();
+  const responses=await Promise.all([fetch(apiBase+"/api/public/gallery"),fetch(apiBase+"/api/public/projects")]);
   const seen=new Set(),items=[];
-  (data.projects||[]).forEach(project=>{
-   const service=project.category==="Videography"?"Videography":project.category==="Storybook"?"Storybook":"Photography";
-   (project.media||[]).filter(item=>item.media_type!=="video").forEach(item=>{
-    if(item.object_key&&!seen.has(item.object_key)){seen.add(item.object_key);items.push({url:apiBase+item.url,title:project.title,service});}
+  if(responses[0].ok){
+   const uploaded=await responses[0].json();
+   (uploaded.images||[]).forEach(image=>{
+    if(image.key&&!seen.has(image.key)){seen.add(image.key);items.push({url:apiBase+image.url,title:"Visual Storyteller",service:"Photography"});}
    });
-   if(project.cover_key&&!seen.has(project.cover_key)){
-    seen.add(project.cover_key);
-    items.push({url:apiBase+"/api/public/media/"+project.cover_key.split("/").map(encodeURIComponent).join("/"),title:project.title,service});
-   }
-  });
+  }
+  if(responses[1].ok){
+   const data=await responses[1].json();
+   (data.projects||[]).forEach(project=>{
+    const service=project.category==="Videography"?"Videography":project.category==="Storybook"?"Storybook":"Photography";
+    (project.media||[]).filter(item=>item.media_type!=="video").forEach(item=>{
+     if(item.object_key&&!seen.has(item.object_key)){seen.add(item.object_key);items.push({url:apiBase+item.url,title:project.title,service});}
+    });
+    if(project.cover_key&&!seen.has(project.cover_key)){
+     seen.add(project.cover_key);
+     items.push({url:apiBase+"/api/public/media/"+project.cover_key.split("/").map(encodeURIComponent).join("/"),title:project.title,service});
+    }
+   });
+  }
   if(!items.length)return;
   gallerySource.replaceChildren();
   items.forEach((item,index)=>{
@@ -163,7 +170,7 @@ async function loadProjectGallery(){
    const img=document.createElement("img");img.loading=index<8?"eager":"lazy";img.src=item.url;img.alt=item.title;
    tile.appendChild(img);gallerySource.appendChild(tile);
   });
- }catch(error){console.warn("Could not load project photos into homepage gallery:",error);}
+ }catch(error){console.warn("Could not load homepage gallery images:",error);}
 }
 function setupSpatialGallery(){
  if(!world||!gallerySource)return;
