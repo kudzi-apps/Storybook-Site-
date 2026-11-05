@@ -136,7 +136,37 @@ document.addEventListener("click",function(event){
 document.addEventListener("keydown",function(event){if(event.key==="Escape"&&panel.classList.contains("open"))closePanel();});
 const world=document.querySelector("#spatial-world");
 const gallerySource=document.querySelector("#spatial-source");
-if(world&&gallerySource){
+async function loadProjectGallery(){
+ if(!gallerySource)return;
+ try{
+  const apiBase="https://visual-storyteller-media-api.kudzaimagigi99.workers.dev";
+  const response=await fetch(apiBase+"/api/public/projects");
+  if(!response.ok)throw new Error("Project gallery unavailable");
+  const data=await response.json();
+  const seen=new Set(),items=[];
+  (data.projects||[]).forEach(project=>{
+   const service=project.category==="Videography"?"Videography":project.category==="Storybook"?"Storybook":"Photography";
+   (project.media||[]).filter(item=>item.media_type!=="video").forEach(item=>{
+    if(item.object_key&&!seen.has(item.object_key)){seen.add(item.object_key);items.push({url:apiBase+item.url,title:project.title,service});}
+   });
+   if(project.cover_key&&!seen.has(project.cover_key)){
+    seen.add(project.cover_key);
+    items.push({url:apiBase+"/api/public/media/"+project.cover_key.split("/").map(encodeURIComponent).join("/"),title:project.title,service});
+   }
+  });
+  if(!items.length)return;
+  gallerySource.replaceChildren();
+  items.forEach((item,index)=>{
+   const tile=document.createElement("button");
+   tile.type="button";tile.className="spatial-tile "+["tile-photo","tile-film","tile-drone","tile-photo","tile-film"][index%5];
+   tile.dataset.service=item.service;tile.setAttribute("aria-label","Explore "+item.service+" — "+item.title);
+   const img=document.createElement("img");img.loading=index<8?"eager":"lazy";img.src=item.url;img.alt=item.title;
+   tile.appendChild(img);gallerySource.appendChild(tile);
+  });
+ }catch(error){console.warn("Could not load project photos into homepage gallery:",error);}
+}
+function setupSpatialGallery(){
+ if(!world||!gallerySource)return;
  const originals=Array.from(gallerySource.querySelectorAll(":scope > .spatial-tile"));
  const media=window.matchMedia("(max-width:700px)");
  function makeDriftingColumns(){
@@ -149,18 +179,15 @@ if(world&&gallerySource){
    column.appendChild(track);gallerySource.appendChild(column);return track;
   });
   originals.forEach((tile,index)=>{
-   tile.classList.add("drift-tile");
-   tile.removeAttribute("style");
+   tile.classList.add("drift-tile");tile.removeAttribute("style");
    tile.style.setProperty("--tilt",((index%5)-2)*.55+"deg");
    tracks[index%count].appendChild(tile);
   });
   tracks.forEach((track,index)=>{
    const firstSet=Array.from(track.children);
    firstSet.forEach(tile=>{
-    const clone=tile.cloneNode(true);
-    clone.setAttribute("aria-hidden","true");clone.tabIndex=-1;
-    clone.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
-    track.appendChild(clone);
+    const clone=tile.cloneNode(true);clone.setAttribute("aria-hidden","true");clone.tabIndex=-1;
+    clone.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));track.appendChild(clone);
    });
    track.style.setProperty("--drift-duration",(media.matches?36:32)+index*4+"s");
    track.style.setProperty("--drift-delay",(-index*8)+"s");
@@ -174,6 +201,9 @@ if(world&&gallerySource){
  world.addEventListener("focusout",event=>{if(!world.contains(event.relatedTarget))world.classList.remove("gallery-paused");});
  world.addEventListener("touchstart",()=>world.classList.add("gallery-paused"),{passive:true});
  world.addEventListener("touchend",()=>setTimeout(()=>world.classList.remove("gallery-paused"),1300),{passive:true});
+}
+if(world&&gallerySource){
+ loadProjectGallery().finally(setupSpatialGallery);
 }
 updateBasket();
 
