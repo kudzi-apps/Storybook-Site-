@@ -28,80 +28,38 @@ function uploadProgress(file,index,total,queueSelector="#upload-queue"){
  top.append(name,state);row.append(top,track,detail);$(queueSelector).append(row);
  return {row,state,bar,detail};
 }
-function canvasBlob(canvas,type,quality){
- return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Could not create an optimized image.")),type,quality));
-}
-async function decodePhoto(file){
- try{return await createImageBitmap(file);}catch(bitmapError){
-  try{
-   const dataUrl=await new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result);
-    reader.onerror=()=>reject(new Error("Could not read selected file."));
-    reader.readAsDataURL(file);
-   });
-   const image=new Image();
-   await new Promise((resolve,reject)=>{
-    image.onload=resolve;
-    image.onerror=()=>reject(new Error("Browser image loader rejected the file."));
-    image.src=dataUrl;
-   });
-   if(!image.naturalWidth||!image.naturalHeight)throw new Error("Image has no readable dimensions.");
-   return {width:image.naturalWidth,height:image.naturalHeight,drawTo:ctx=>ctx.drawImage(image,0,0),close:()=>{image.src="";}};
-  }catch(imageError){throw new Error(file.name+" could not be decoded by this browser. The file itself may still be valid; try another browser or export a fresh JPEG.");}
- }
-}
-async function optimizePhoto(file,maxEdge){
- const bitmap=await decodePhoto(file);
- try{
-  const scale=Math.min(1,maxEdge/Math.max(bitmap.width,bitmap.height));
-  const width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
-  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
-  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,width,height);
-  if(bitmap.drawTo)bitmap.drawTo(ctx);else ctx.drawImage(bitmap,0,0,width,height);
-  const main=await canvasBlob(canvas,"image/webp",0.84);
-  if(main.type!=="image/webp")throw new Error("This browser cannot create WebP images. Please use Chrome or Edge.");
-  const thumbScale=Math.min(1,400/Math.max(width,height));
-  const thumbCanvas=document.createElement("canvas");thumbCanvas.width=Math.max(1,Math.round(width*thumbScale));thumbCanvas.height=Math.max(1,Math.round(height*thumbScale));
-  thumbCanvas.getContext("2d",{alpha:false}).drawImage(canvas,0,0,thumbCanvas.width,thumbCanvas.height);
-  const thumb=await canvasBlob(thumbCanvas,"image/webp",0.78);
-  return {main,thumb,width,height};
- }finally{bitmap.close?.();}
+function mediaContentType(file){
+ if(file.type)return file.type;
+ const ext=file.name.split(".").pop().toLowerCase();
+ const types={jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",gif:"image/gif",avif:"image/avif",heic:"image/heic",heif:"image/heif",mp4:"video/mp4",m4v:"video/mp4",mov:"video/quicktime",webm:"video/webm"};
+ return types[ext]||"application/octet-stream";
 }
 async function uploadFiles(files,folder="uploads",queueSelector="#upload-queue"){
- const valid=files.filter(f=>f.type.startsWith("image/")||f.type.startsWith("video/"));
- if(!valid.length)return;
+ const valid=files.filter(f=>{
+  const type=mediaContentType(f);
+  return type.startsWith("image/")||type.startsWith("video/");
+ });
+ if(!valid.length){if(files.length)alert("Choose image or video files.");return;}
  $(queueSelector).replaceChildren();
  const errors=[];
  for(let i=0;i<valid.length;i++){
-  const file=valid[i],ui=uploadProgress(file,i,valid.length,queueSelector);
+  const file=valid[i],ui=uploadProgress(file,i,valid.length,queueSelector),contentType=mediaContentType(file);
   try{
-   if(file.type.startsWith("image/")){
-    ui.state.textContent="Optimizing…";
-    const optimized=await optimizePhoto(file,folder==="gallery"?1600:2000);
-    const base=file.name.replace(/\.[^.]+$/,"").replace(/[^a-zA-Z0-9._-]+/g,"-")||"photo";
-    const filename=base+".webp";
-    ui.detail.textContent=optimized.width+" × "+optimized.height+" · "+formatBytes(optimized.main.size)+" web copy";
-    const init=await api("/api/media",{method:"POST",body:JSON.stringify({filename,folder})});
-    ui.state.textContent="Uploading web copy…";
-    await putWithProgress(init.uploadUrl,optimized.main,ui);
-    const thumbInit=await api("/api/media",{method:"POST",body:JSON.stringify({filename:"thumbnail.webp",folder:"thumbs",key:"thumbs/"+init.key})});
-    ui.state.textContent="Uploading thumbnail…";
-    await putWithProgress(thumbInit.uploadUrl,optimized.thumb,ui);
-    ui.state.textContent="Done";ui.bar.style.width="100%";
-    ui.detail.textContent=formatBytes(file.size)+" original → "+formatBytes(optimized.main.size)+" web + "+formatBytes(optimized.thumb.size)+" thumbnail";
-   }else{
-    const init=await api("/api/media",{method:"POST",body:JSON.stringify({filename:file.name,folder})});
-    ui.state.textContent="Uploading video…";await putWithProgress(init.uploadUrl,file,ui);ui.state.textContent="Done";
-   }
+   const isImage=contentType.startsWith("image/");
+   const init=await api("/api/media",{method:"POST",body:JSON.stringify({filename:file.name,folder})});
+   ui.state.textContent=isImage?"Uploading image…":"Uploading video…";
+   ui.detail.textContent=formatBytes(file.size)+" · original file";
+   await putWithProgress(init.uploadUrl,file,ui,contentType);
+   ui.state.textContent="Done";ui.bar.style.width="100%";
+   ui.detail.textContent=formatBytes(file.size)+" · stored without resizing or conversion";
   }catch(err){errors.push(err.message);ui.state.textContent="Failed";ui.row.classList.add("failed");}
  }
  await loadMedia();
  if(errors.length)alert(errors.join("\n"));
 }
-function putWithProgress(url,file,ui){
+function putWithProgress(url,file,ui,contentType=mediaContentType(file)){
  return new Promise((resolve,reject)=>{
-  const xhr=new XMLHttpRequest();const target=new URL(url,API).href;xhr.open("PUT",target);xhr.setRequestHeader("authorization","Bearer "+token);xhr.setRequestHeader("content-type",file.type||"application/octet-stream");
+  const xhr=new XMLHttpRequest();const target=new URL(url,API).href;xhr.open("PUT",target);xhr.setRequestHeader("authorization","Bearer "+token);xhr.setRequestHeader("content-type",contentType||"application/octet-stream");
   xhr.upload.onprogress=e=>{if(e.lengthComputable){const pct=Math.round(e.loaded/e.total*100);ui.bar.style.width=pct+"%";ui.state.textContent=pct+"%";ui.detail.textContent=formatBytes(e.loaded)+" of "+formatBytes(e.total);}};
   xhr.onload=()=>{if(xhr.status>=200&&xhr.status<300){ui.bar.style.width="100%";ui.state.textContent="Uploaded";ui.row.classList.add("complete");resolve();}else{ui.state.textContent="Failed";ui.detail.textContent="Upload failed ("+xhr.status+")";ui.row.classList.add("failed");reject(new Error("Upload failed for "+file.name+" ("+xhr.status+")"));}};
   xhr.onerror=()=>{ui.state.textContent="Failed";ui.detail.textContent="Network error";ui.row.classList.add("failed");reject(new Error("Network error uploading "+file.name));};
