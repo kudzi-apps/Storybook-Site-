@@ -79,14 +79,19 @@ export default {
       const objects = listings.flatMap(listed => listed.objects || []);
       const images = objects.filter(object => {
         const key = object.key.toLowerCase();
-        return /\.(jpe?g|png|webp|gif|avif)$/i.test(key);
+        return !key.startsWith("thumbs/") && /\.(jpe?g|png|webp|gif|avif)$/i.test(key);
       }).sort((a,b) => new Date(b.uploaded) - new Date(a.uploaded))
-        .map(object => ({
-          key: object.key,
-          url: "/api/public/media/" + object.key.split("/").map(encodeURIComponent).join("/"),
-          uploaded: object.uploaded,
-          size: object.size
-        }));
+        .map(object => {
+          const encoded = object.key.split("/").map(encodeURIComponent).join("/");
+          const thumbKey = "thumbs/" + object.key;
+          return {
+            key: object.key,
+            url: "/api/public/media/" + encoded,
+            thumbUrl: "/api/public/media/" + thumbKey.split("/").map(encodeURIComponent).join("/"),
+            uploaded: object.uploaded,
+            size: object.size
+          };
+        });
       return response({ images }, request, env, 200, { "cache-control": "public, max-age=60" });
     }
 
@@ -221,7 +226,8 @@ export default {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
       const prefix = url.searchParams.get("prefix") || "";
       const listed = await env.MEDIA.list({ prefix: safeKey(prefix) || undefined, limit: 1000 });
-      return response({ objects: listed.objects.map(o => ({ key: o.key, size: o.size, uploaded: o.uploaded, etag: o.etag, contentType: o.httpMetadata?.contentType || null })), truncated: listed.truncated, cursor: listed.cursor || null }, request, env);
+      const visible = listed.objects.filter(o => !o.key.startsWith("thumbs/"));
+      return response({ objects: visible.map(o => ({ key: o.key, size: o.size, uploaded: o.uploaded, etag: o.etag, contentType: o.httpMetadata?.contentType || null })), truncated: listed.truncated, cursor: listed.cursor || null }, request, env);
     }
 
     if (url.pathname === "/api/media" && request.method === "POST") {
@@ -230,8 +236,10 @@ export default {
       const filename = safeFilename(body?.filename);
       const folder = safeKey(body?.folder || "uploads");
       if (!body || !folder) return response({ error: "Invalid upload details" }, request, env, 400);
-      const key = folder + "/" + crypto.randomUUID() + "-" + filename;
-      return response({ key, uploadUrl: "/api/media/" + encodeURIComponent(key), method: "PUT", maxBytes: 100 * 1024 * 1024 }, request, env, 201);
+      const requestedKey = body?.key ? safeKey(body.key) : null;
+      if (body?.key && (!requestedKey || !requestedKey.startsWith("thumbs/"))) return response({ error: "Invalid derivative key" }, request, env, 400);
+      const key = requestedKey || folder + "/" + crypto.randomUUID() + "-" + filename;
+      return response({ key, uploadUrl: "/api/media/" + key.split("/").map(encodeURIComponent).join("/"), method: "PUT", maxBytes: 100 * 1024 * 1024 }, request, env, 201);
     }
 
     if (url.pathname.startsWith("/api/media/")) {
