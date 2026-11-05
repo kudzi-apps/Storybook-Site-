@@ -75,8 +75,9 @@ export default {
     }
     if (url.pathname === "/api/public/gallery" && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
-      const listed = await env.MEDIA.list({ prefix: "uploads/", limit: 1000 });
-      const images = (listed.objects || []).filter(object => {
+      const listings = await Promise.all([env.MEDIA.list({ prefix: "uploads/", limit: 1000 }),env.MEDIA.list({ prefix: "gallery/", limit: 1000 })]);
+      const objects = listings.flatMap(listed => listed.objects || []);
+      const images = objects.filter(object => {
         const key = object.key.toLowerCase();
         return /\\.(jpe?g|png|webp|gif|avif)$/i.test(key);
       }).sort((a,b) => new Date(b.uploaded) - new Date(a.uploaded))
