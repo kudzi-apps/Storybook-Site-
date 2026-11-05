@@ -41,3 +41,13 @@
 .upload-detail{font-size:9px;color:var(--muted)}
 .upload-row.complete .upload-state{color:#79c99b}.upload-row.complete .upload-bar{background:#79c99b}
 .upload-row.failed .upload-state{color:#e28f83}.upload-row.failed .upload-bar{background:#e28f83}
+
+/* Media selection and bulk actions */
+.media-bulk-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:14px 0;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#ffffff05}
+.media-bulk-actions span{margin-right:auto;font-size:11px;color:var(--muted)}
+.media-bulk-actions button{border:1px solid var(--line);border-radius:6px;padding:9px 12px;background:#ffffff0a;color:var(--text);font:500 11px Ubuntu;cursor:pointer}
+.media-bulk-actions button:disabled{opacity:.4;cursor:not-allowed}
+.media-bulk-actions button.danger{border-color:#a94e4e;color:#f0a09a}
+.media-select{display:flex;align-items:center;gap:7px;padding:8px 9px;font-size:10px;color:var(--muted);cursor:pointer}
+.media-select input{accent-color:var(--accent);width:16px;height:16px}
+.media-item:has([data-media-select]:checked){outline:1px solid var(--accent);outline-offset:2px;border-radius:8px}
