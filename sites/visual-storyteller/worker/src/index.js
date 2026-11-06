@@ -1,7 +1,10 @@
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
 
 function json(data, status = 200, extra = {}) {
-  return new Response(JSON.stringify(data), { status, headers: { ...JSON_HEADERS, ...extra } });
+  return new Response(JSON.stringify(data), { status, headers: {
+    ...JSON_HEADERS, "x-content-type-options": "nosniff",
+    "referrer-policy": "no-referrer", "x-frame-options": "DENY", ...extra
+  } });
 }
 function corsHeaders(request, env) {
   const origin = request.headers.get("Origin") || "";
@@ -75,8 +78,8 @@ export default {
     }
     if (url.pathname === "/api/public/gallery" && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
-      const listings = await Promise.all([env.MEDIA.list({ prefix: "uploads/", limit: 1000 }),env.MEDIA.list({ prefix: "gallery/", limit: 1000 })]);
-      const objects = listings.flatMap(listed => listed.objects || []);
+      const listed = await env.MEDIA.list({ prefix: "gallery/", limit: 1000, include: ["customMetadata"] });
+      const objects = (listed.objects || []).filter(object => object.customMetadata?.visibility === "public");
       const images = objects.filter(object => {
         const key = object.key.toLowerCase();
         return !key.startsWith("thumbs/") && /\.(jpe?g|png|webp|gif|avif)$/i.test(key);
@@ -100,6 +103,14 @@ export default {
       if (!key) return response({ error: "Invalid object key" }, request, env, 400);
       const object = await env.MEDIA.get(key);
       if (!object) return response({ error: "Not found" }, request, env, 404);
+      let isPublished = object.customMetadata?.visibility === "public";
+      if (!isPublished && env.db) {
+        const published = await env.db.prepare(
+          "SELECT 1 AS ok FROM project_media pm JOIN projects p ON p.id=pm.project_id WHERE pm.object_key=? AND p.status='published' UNION SELECT 1 AS ok FROM projects WHERE cover_key=? AND status='published' LIMIT 1"
+        ).bind(key, key).first();
+        isPublished = Boolean(published);
+      }
+      if (!isPublished) return response({ error: "Not found" }, request, env, 404);
       const headers = new Headers(corsHeaders(request, env));
       object.writeHttpMetadata(headers);
       headers.set("etag", object.httpEtag);
@@ -227,6 +238,7 @@ export default {
       if (!body || (body.all !== true && !Array.isArray(body.keys))) return response({ error: "Provide keys or set all=true" }, request, env, 400);
       let keys = [];
       if (body.all === true) {
+        if (body.confirm !== "DELETE ALL MEDIA") return response({ error: "Explicit confirmation is required" }, request, env, 400);
         let cursor;
         do {
           const listed = await env.MEDIA.list({ limit: 1000, ...(cursor ? { cursor } : {}) });
@@ -262,7 +274,7 @@ export default {
       const body = await request.json().catch(() => null);
       const filename = safeFilename(body?.filename);
       const folder = safeKey(body?.folder || "uploads");
-      if (!body || !folder) return response({ error: "Invalid upload details" }, request, env, 400);
+      if (!body || !["uploads","gallery","backgrounds","thumbs"].includes(folder)) return response({ error: "Invalid upload folder" }, request, env, 400);
       const requestedKey = body?.key ? safeKey(body.key) : null;
       if (body?.key && (!requestedKey || !requestedKey.startsWith("thumbs/"))) return response({ error: "Invalid derivative key" }, request, env, 400);
       const key = requestedKey || folder + "/" + crypto.randomUUID() + "-" + filename;
@@ -276,8 +288,12 @@ export default {
       if (request.method === "PUT") {
         const length = Number(request.headers.get("content-length") || 0);
         if (length > 100 * 1024 * 1024) return response({ error: "Upload exceeds the 100 MB request limit. Use a multipart upload workflow for larger files." }, request, env, 413);
-        const contentType = request.headers.get("content-type") || "application/octet-stream";
-        const object = await env.MEDIA.put(key, request.body, { httpMetadata: { contentType }, customMetadata: { visibility: "private" } });
+        const contentType = (request.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+        const allowedTypes = new Set(["image/jpeg","image/png","image/webp","image/gif","image/avif","image/heic","image/heif","video/mp4","video/quicktime","video/webm"]);
+        if (!allowedTypes.has(contentType)) return response({ error: "Unsupported media type" }, request, env, 415);
+        if (!request.body) return response({ error: "Upload body is required" }, request, env, 400);
+        const visibility = key.startsWith("gallery/") ? "public" : "private";
+        const object = await env.MEDIA.put(key, request.body, { httpMetadata: { contentType }, customMetadata: { visibility } });
         return response({ key, size: object.size, etag: object.etag, uploaded: true }, request, env, 201);
       }
       if (request.method === "GET") {
