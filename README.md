@@ -1,10 +1,21 @@
-# Visual Storyteller + Storybook
+# Visual Storyteller Website Engine
 
-Two independently deployable static front ends in one Git repository:
+Portable source code for the Visual Storyteller studio website, Site Studio admin interface, Cloudflare Worker API and the separate Storybook front-end prototype.
 
-- `sites/visual-storyteller` — studio website and interactive quote estimate.
-- `sites/storybook` — guest-facing wedding experience prototype.
+## Start here
 
-Both are designed to deploy independently on Cloudflare Pages by setting the respective output directory. They currently use local sample data and stock photography. No live booking, RSVP, payment, notification, or organiser dashboard backend is connected yet.
+- [Engine overview and setup](ENGINE-README.md)
+- [Portable PC / Google Drive backup guide](PORTABLE-BACKUP-GUIDE.md)
+- [Current features and limitations](ENGINE-SCOPE.md)
 
-The existing root-level preview is retained while the new site builds are developed in `sites/`.
+## Project structure
+
+- `sites/visual-storyteller` — public studio website, quote estimate interface, Site Studio admin and Cloudflare Worker.
+- `sites/storybook` — separate guest-facing wedding experience prototype.
+- `.github/workflows` — deployment workflows.
+
+## Important limitations
+
+This is a portable snapshot of the current codebase, not yet a generic multi-tenant website builder. The quote builder is an estimate only; it does not submit enquiries or book dates. Storybook is a front-end prototype and its RSVP / organiser backend is not connected. Portfolio images include stock placeholders that must be replaced before public commercial launch.
+
+Live customer media in R2, D1 database records, secrets and Cloudflare credentials are not included in the source package. See the backup guide before relying on this ZIP as a full production backup.
