@@ -29,7 +29,7 @@ async function deleteMedia(keys,all=false){
  if(!count){alert("There are no media files to delete.");return;}
  const message=all?"Delete every file in the Media Library? This cannot be undone.":"Delete "+count+" marked file"+(count===1?"":"s")+"? This cannot be undone.";
  if(!confirm(message))return;
- try{const result=await api("/api/media/bulk-delete",{method:"POST",body:JSON.stringify(all?{all:true}:{keys})});alert("Deleted "+result.deleted+" file"+(result.deleted===1?"":"s")+".");await loadMedia();}
+ try{const confirmation=all?prompt('Type DELETE ALL MEDIA to permanently delete every media file:'):"";if(all&&confirmation!=="DELETE ALL MEDIA")return;const result=await api("/api/media/bulk-delete",{method:"POST",body:JSON.stringify(all?{all:true,confirm:confirmation}:{keys})});alert("Deleted "+result.deleted+" file"+(result.deleted===1?"":"s")+".");await loadMedia();}
  catch(error){alert("Could not delete media: "+error.message);}
 }
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
