@@ -78,8 +78,8 @@ export default {
     }
     if (url.pathname === "/api/public/gallery" && request.method === "GET") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
-      const listed = await env.MEDIA.list({ prefix: "gallery/", limit: 1000, include: ["customMetadata"] });
-      const objects = (listed.objects || []).filter(object => object.customMetadata?.visibility === "public");
+      const listed = await env.MEDIA.list({ prefix: "gallery/", limit: 1000 });
+      const objects = listed.objects || [];
       const images = objects.filter(object => {
         const key = object.key.toLowerCase();
         return !key.startsWith("thumbs/") && /\.(jpe?g|png|webp|gif|avif)$/i.test(key);
@@ -103,7 +103,7 @@ export default {
       if (!key) return response({ error: "Invalid object key" }, request, env, 400);
       const object = await env.MEDIA.get(key);
       if (!object) return response({ error: "Not found" }, request, env, 404);
-      let isPublished = object.customMetadata?.visibility === "public";
+      let isPublished = key.startsWith("gallery/") || object.customMetadata?.visibility === "public";
       if (!isPublished && env.db) {
         const published = await env.db.prepare(
           "SELECT 1 AS ok FROM project_media pm JOIN projects p ON p.id=pm.project_id WHERE pm.object_key=? AND p.status='published' UNION SELECT 1 AS ok FROM projects WHERE cover_key=? AND status='published' LIMIT 1"
