@@ -168,7 +168,7 @@ async function loadProjectGallery(){
    const tile=document.createElement("button");
    tile.type="button";tile.className="spatial-tile "+["tile-photo","tile-film","tile-drone","tile-photo","tile-film"][index%5];
    tile.dataset.service=item.service;tile.setAttribute("aria-label","Explore "+item.service+" — "+item.title);
-   const img=document.createElement("img");img.loading=index<8?"eager":"lazy";img.src=item.url;img.alt=item.title;
+   const img=document.createElement("img");img.loading=index<3?"eager":"lazy";img.decoding="async";img.src=item.url;img.alt=item.title;
    tile.appendChild(img);gallerySource.appendChild(tile);
   });
  }catch(error){console.warn("Could not load homepage gallery images:",error);}
