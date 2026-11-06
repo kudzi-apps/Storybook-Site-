@@ -91,7 +91,7 @@ export default {
             size: object.size
           };
         });
-      return response({ images }, request, env, 200, { "cache-control": "public, max-age=60" });
+      return response({ images }, request, env, 200, { "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600" });
     }
 
     if (url.pathname.startsWith("/api/public/media/") && request.method === "GET") {
@@ -103,7 +103,7 @@ export default {
       const headers = new Headers(corsHeaders(request, env));
       object.writeHttpMetadata(headers);
       headers.set("etag", object.httpEtag);
-      headers.set("cache-control", "public, max-age=3600");
+      headers.set("cache-control", "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400");
       return new Response(object.body, { headers });
     }
 
@@ -111,7 +111,7 @@ export default {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const rows = await env.db.prepare("SELECT key,value FROM site_settings").all();
       const all = Object.fromEntries((rows.results || []).map(row => [row.key, JSON.parse(row.value)]));
-      return response({ settings: all }, request, env, 200, { "cache-control": "public, max-age=60" });
+      return response({ settings: all }, request, env, 200, { "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600" });
     }
 
     if (url.pathname === "/api/public/projects" && request.method === "GET") {
@@ -122,7 +122,7 @@ export default {
         const assets = await env.db.prepare("SELECT object_key,media_type,alt_text,sort_order FROM project_media WHERE project_id=? ORDER BY sort_order ASC,created_at ASC").bind(project.id).all();
         projects.push({ ...project, media: (assets.results || []).map(item => ({ ...item, url: "/api/public/media/" + item.object_key.split("/").map(encodeURIComponent).join("/") })) });
       }
-      return response({ projects }, request, env);
+      return response({ projects }, request, env, 200, { "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600" });
     }
 
     const denied = await requireAdmin(request, env);
