@@ -984,3 +984,40 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
   height: 100% !important;
  }
 }
+
+
+/* Compact quote builder: keep ordinary bookings visible in one panel */
+.quote-builder-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:14px;align-items:start}
+.quote-builder-left,.quote-booking-side{min-width:0}
+.quote-builder-left .quote-service-grid{margin:0 0 10px;gap:7px}
+.quote-builder-left .quote-service-tile{min-height:76px;padding:9px 10px;gap:4px;border-radius:9px}
+.quote-builder-left .quote-service-icon{font-size:17px;line-height:1}
+.quote-builder-left .quote-service-tile b{font-size:12px}
+.quote-builder-left .quote-service-tile small{font-size:9px;line-height:1.25}
+.quote-builder-left .quote-config{margin-top:8px;padding-top:11px}
+.quote-builder-left .quote-config-head{margin-bottom:10px}
+.quote-builder-left .quote-config-head h3{font-size:22px}
+.quote-builder-left .quote-slider-label{margin-bottom:7px}
+.quote-builder-left .quote-slider-note{margin:8px 0;font-size:10px;line-height:1.4}
+.quote-builder-left .add-quote{margin-top:7px;padding:10px 16px}
+.quote-booking-side{display:grid;gap:9px}
+.quote-booking-card{display:grid;gap:8px;padding:12px;border:1px solid #ffffff30;border-radius:11px;background:linear-gradient(145deg,#ffffff0d,#ffffff04)}
+.quote-booking-card>label{display:grid;gap:5px;color:#d8d9dc;font-size:11px}
+.quote-booking-card input{width:100%;min-width:0;border:1px solid #ffffff38;border-radius:7px;background:#ffffff0b;color:#fff;padding:9px 10px;font:12px Ubuntu,sans-serif;color-scheme:dark}
+.quote-booking-card input::placeholder{color:#999da5}
+.quote-booking-card small{font-size:9px;line-height:1.35;color:#aeb1b8}
+.event-package-stops{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:8px}
+.event-package-stops button{min-width:0;border:1px solid #ffffff35;border-radius:7px;background:#ffffff08;color:#d8d9dc;padding:7px 3px;font:10px Ubuntu,sans-serif;cursor:pointer}
+.event-package-stops button.active{background:#fff;color:#111;border-color:#fff}
+.event-package-range{accent-color:#f2b4a9}
+.quote-builder-layout+.quote-continue{margin-top:10px;padding:11px}
+@media(max-width:760px){
+ .quote-builder-layout{grid-template-columns:1fr}
+ .quote-builder-left .quote-service-tile{min-height:68px}
+ .quote-booking-side{grid-template-columns:1fr 1fr}
+}
+@media(max-width:520px){
+ .quote-booking-side{grid-template-columns:1fr}
+ .quote-builder-left .quote-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .event-package-stops button{font-size:9px}
+}
