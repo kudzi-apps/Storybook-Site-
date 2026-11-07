@@ -921,3 +921,16 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
 
 /* Stronger desktop perspective for the 50-degree camera test */
 @media(min-width:701px){.spatial-gallery{perspective:650px!important;perspective-origin:50% 42%!important;}}
+
+
+/* Desktop-only gallery density: five slimmer drifting columns */
+@media (min-width: 901px) {
+ .spatial-source.gallery-ready,
+ .spatial-source {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(8px, 1vw, 15px) !important;
+ }
+ .spatial-source .spatial-tile.drift-tile {
+  border-radius: 4px !important;
+ }
+}
