@@ -232,6 +232,34 @@ export default {
       return response({ published: true, revision: id, projectCount: count }, request, env);
     }
 
+    if (url.pathname === "/api/media/gallery-clear" && request.method === "POST") {
+      if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
+      const body = await request.json().catch(() => null);
+      if (body?.confirm !== "CLEAR MAIN GALLERY") return response({ error: "Explicit gallery confirmation is required" }, request, env, 400);
+      const keys = [];
+      let cursor;
+      do {
+        const listed = await env.MEDIA.list({ prefix: "gallery/", limit: 1000, ...(cursor ? { cursor } : {}) });
+        keys.push(...(listed.objects || []).map(object => object.key));
+        cursor = listed.truncated ? listed.cursor : undefined;
+      } while (cursor);
+      if (env.db && keys.length) {
+        const referenced = [];
+        for (const key of keys) {
+          const row = await env.db.prepare(
+            "SELECT 1 AS ok FROM project_media WHERE object_key=? UNION SELECT 1 AS ok FROM projects WHERE cover_key=? LIMIT 1"
+          ).bind(key, key).first();
+          if (row) referenced.push(key);
+        }
+        if (referenced.length) return response({
+          error: "Some main-gallery files are also used by portfolio projects. Nothing was deleted. Remove those files from their project references first.",
+          referencedCount: referenced.length
+        }, request, env, 409);
+      }
+      for (const key of keys) await env.MEDIA.delete(key);
+      return response({ deleted: keys.length, folder: "gallery/" }, request, env);
+    }
+
     if (url.pathname === "/api/media/bulk-delete" && request.method === "POST") {
       if (!env.MEDIA) return response({ error: "R2 binding MEDIA is not configured" }, request, env, 503);
       const body = await request.json().catch(() => null);
