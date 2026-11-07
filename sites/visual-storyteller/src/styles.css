@@ -958,3 +958,29 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
   height: 100% !important;
  }
 }
+
+
+/* Mobile: allow vertical swiping directly over the gallery photo field */
+@media (max-width: 700px) {
+ .spatial-gallery {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+ }
+ .spatial-world {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 180svh !important;
+  min-height: 180svh !important;
+  margin: 0 !important;
+  overflow: visible !important;
+ }
+ .spatial-source.gallery-ready {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+ }
+}
