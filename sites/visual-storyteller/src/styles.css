@@ -934,3 +934,27 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
   border-radius: 4px !important;
  }
 }
+
+/* Desktop gallery scrolling: extend the photographic field without changing its loop */
+@media (min-width: 701px) {
+ .spatial-gallery {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.38) rgba(255,255,255,.06);
+ }
+ .spatial-world {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 180svh !important;
+  min-height: 180svh !important;
+  margin: 0 !important;
+ }
+ .spatial-source.gallery-ready {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+ }
+}
