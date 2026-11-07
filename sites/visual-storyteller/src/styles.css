@@ -1021,3 +1021,20 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
  .quote-builder-left .quote-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .event-package-stops button{font-size:9px}
 }
+
+
+/* Respect iOS safe areas on devices using viewport-fit=cover */
+@supports (padding: max(0px)) {
+ @media (max-width: 650px) {
+  .topbar { top: max(9px, env(safe-area-inset-top)); }
+  .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+  .info-panel {
+   top: max(80px, calc(env(safe-area-inset-top) + 70px));
+   bottom: max(82px, calc(env(safe-area-inset-bottom) + 72px));
+  }
+  .panel-backdrop {
+   top: max(76px, calc(env(safe-area-inset-top) + 66px));
+   bottom: max(78px, calc(env(safe-area-inset-bottom) + 68px));
+  }
+ }
+}
