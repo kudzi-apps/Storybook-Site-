@@ -41,8 +41,34 @@ function safeFilename(value) {
   return String(value || "upload").normalize("NFKC").replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120) || "upload";
 }
 async function requireAdmin(request, env) {
-  if (!authorised(request, env)) return json({ error: "Unauthorised" }, 401);
-  return null;
+  if (authorised(request, env)) return null;
+  if (!env.db) return json({ error: "Authentication protection is temporarily unavailable" }, 503);
+
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip));
+  const ipHash = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+  const now = Math.floor(Date.now() / 1000);
+  const windowSeconds = 15 * 60;
+  const cutoff = now - windowSeconds;
+
+  try {
+    await env.db.prepare("DELETE FROM admin_auth_attempts WHERE window_started < ?").bind(now - 86400).run();
+    const attempt = await env.db.prepare(
+      "INSERT INTO admin_auth_attempts (ip_hash,window_started,attempts) VALUES (?,?,1) " +
+      "ON CONFLICT(ip_hash) DO UPDATE SET " +
+      "attempts=CASE WHEN admin_auth_attempts.window_started <= ? THEN 1 ELSE admin_auth_attempts.attempts+1 END, " +
+      "window_started=CASE WHEN admin_auth_attempts.window_started <= ? THEN excluded.window_started ELSE admin_auth_attempts.window_started END " +
+      "RETURNING attempts,window_started"
+    ).bind(ipHash, now, cutoff, cutoff).first();
+
+    if (attempt && attempt.attempts > 10) {
+      const retryAfter = Math.max(1, attempt.window_started + windowSeconds - now);
+      return json({ error: "Too many failed sign-in attempts. Try again later." }, 429, { "retry-after": String(retryAfter) });
+    }
+  } catch {
+    return json({ error: "Authentication protection is temporarily unavailable" }, 503);
+  }
+  return json({ error: "Unauthorised" }, 401);
 }
 export default {
   async fetch(request, env) {
@@ -120,9 +146,15 @@ export default {
 
     if (url.pathname === "/api/public/settings" && request.method === "GET") {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
-      const rows = await env.db.prepare("SELECT key,value FROM site_settings").all();
-      const all = Object.fromEntries((rows.results || []).map(row => [row.key, JSON.parse(row.value)]));
-      return response({ settings: all }, request, env, 200, { "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600" });
+      // Only the appearance configuration is consumed by the public website.
+      // Keep all other settings private by default.
+      const row = await env.db.prepare("SELECT value FROM site_settings WHERE key='appearance'").first();
+      let appearance = null;
+      if (row) {
+        try { appearance = JSON.parse(row.value); }
+        catch { return response({ error: "Public appearance settings are invalid" }, request, env, 500); }
+      }
+      return response({ settings: appearance ? { appearance } : {} }, request, env, 200, { "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600" });
     }
 
     if (url.pathname === "/api/public/projects" && request.method === "GET") {
@@ -321,7 +353,24 @@ export default {
         if (!allowedTypes.has(contentType)) return response({ error: "Unsupported media type" }, request, env, 415);
         if (!request.body) return response({ error: "Upload body is required" }, request, env, 400);
         const visibility = key.startsWith("gallery/") ? "public" : "private";
-        const object = await env.MEDIA.put(key, request.body, { httpMetadata: { contentType }, customMetadata: { visibility } });
+        const maxBytes = 100 * 1024 * 1024;
+        let receivedBytes = 0;
+        const limitedBody = request.body.pipeThrough(new TransformStream({
+          transform(chunk, controller) {
+            receivedBytes += chunk.byteLength;
+            if (receivedBytes > maxBytes) throw new Error("UPLOAD_TOO_LARGE");
+            controller.enqueue(chunk);
+          }
+        }));
+        let object;
+        try {
+          object = await env.MEDIA.put(key, limitedBody, { httpMetadata: { contentType }, customMetadata: { visibility } });
+        } catch (error) {
+          if (error?.message === "UPLOAD_TOO_LARGE") {
+            return response({ error: "Upload exceeds the 100 MB request limit. Use a multipart upload workflow for larger files." }, request, env, 413);
+          }
+          throw error;
+        }
         return response({ key, size: object.size, etag: object.etag, uploaded: true }, request, env, 201);
       }
       if (request.method === "GET") {
