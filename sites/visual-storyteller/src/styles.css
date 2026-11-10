@@ -1066,3 +1066,12 @@ body:before{background:linear-gradient(var(--vs-bg,rgba(9,6,4,0)),var(--vs-bg,rg
   border-left: 1px solid rgba(255,255,255,.3) !important;
  }
 }
+
+@media (min-width: 651px) {
+ .topbar .brand {
+  justify-content: center !important;
+ }
+ .topbar .brand-logo {
+  object-position: center center !important;
+ }
+}
