@@ -136,11 +136,11 @@ body{background-color:#100805!important;background-image:linear-gradient(90deg,r
 /* Programme panel and four equal guest destinations */
 .programme-panel{width:min(720px,100%)}
 .programme-highlight{padding:15px 17px;margin:14px 0;border:1px solid rgba(255,255,255,.48);border-radius:9px;background:rgba(255,255,255,.09)}
-.programme-highlight h3{margin:7px 0 4px;font:500 23px 'Cormorant Garamond',Georgia,serif}
+.programme-highlight h3{margin:7px 0 4px;font:500 23px 'DM Serif Display',Georgia,serif}
 .programme-highlight p,.announcement-note p{margin:0;color:#ddd;font-size:12px;line-height:1.65}
 .programme-highlight.coming-up{border-color:rgba(237,28,36,.75);background:rgba(237,28,36,.09)}
 .programme-list{margin:22px 0}
-.programme-list>h3{font:500 25px 'Cormorant Garamond',Georgia,serif}
+.programme-list>h3{font:500 25px 'DM Serif Display',Georgia,serif}
 .programme-row{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.17)}
 .programme-row time{color:#fff;font-size:11px;letter-spacing:.08em;padding-top:2px}
 .programme-row strong,.programme-row span{display:block}
@@ -217,7 +217,7 @@ body{background-color:#100805!important;background-image:linear-gradient(90deg,r
   .storybook-wordmark{
     display:block;
     color:#fff;
-    font:500 clamp(19px,5vw,27px)/1 'Cormorant Garamond',Georgia,serif;
+    font:500 clamp(19px,5vw,27px)/1 'DM Serif Display',Georgia,serif;
     letter-spacing:-.045em;
     white-space:nowrap;
   }
@@ -297,7 +297,7 @@ body{background-color:#100805!important;background-image:linear-gradient(90deg,r
     display:block;
     max-width:100%;
     margin:0 0 12px;
-    font:500 clamp(27px,7vw,42px)/1.02 'Cormorant Garamond',Georgia,serif;
+    font:500 clamp(27px,7vw,42px)/1.02 'DM Serif Display',Georgia,serif;
     text-align:left;
     overflow-wrap:anywhere;
   }
@@ -347,3 +347,41 @@ body{background-color:#100805!important;background-image:linear-gradient(90deg,r
   .brand-logo .wordmark-fallback{display:none}
   .brand-logo .storybook-wordmark{display:block}
 }
+
+/* Mobile panel system: the active page is a self-contained scroll surface. */
+@media(max-width:760px){
+  html,body,#app{height:100%;min-height:100%;overflow:hidden}
+  .topbar,.bottombar{left:10px;right:10px}
+  main{height:100dvh;padding:82px 0 82px}
+  .stage{width:calc(100% - 20px);height:100%;margin:0 10px;padding:5px 0;overflow:hidden}
+  .carousel{position:relative;width:100%;height:100%;max-height:100%;min-height:0;gap:0;perspective:1200px;overflow:hidden;align-items:stretch}
+  .story-card.is-active{position:relative;display:block;flex:1 1 100%;width:100%;height:100%;max-height:100%;min-height:0;margin:0;border-radius:15px;overflow:hidden;transform:translateZ(20px);border:1px solid rgba(255,255,255,.62);box-shadow:0 18px 45px rgba(0,0,0,.55)}
+  .mobile-panel-scroll{position:absolute;z-index:4;inset:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:26px 22px 30px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.45) transparent}
+  .mobile-panel-heading{padding:0 0 20px}
+  .mobile-panel-heading .card-kicker{display:block;font-size:9px;line-height:1.5;letter-spacing:.17em;color:rgba(255,255,255,.88);text-transform:uppercase;margin-bottom:10px}
+  .mobile-panel-heading h2{font:400 clamp(30px,8vw,42px)/1.02 'DM Serif Display',serif;margin:0 0 10px;color:#fff}
+  .mobile-panel-heading p{font:400 13px/1.65 Ubuntu,sans-serif;color:#eee;margin:0;max-width:38ch}
+  .mobile-detail{font:400 13px/1.7 Ubuntu,sans-serif;color:#eee}
+  .mobile-detail h3,.programme-list>h3{font:400 25px/1.15 'DM Serif Display',serif;color:#fff;margin:22px 0 9px}
+  .mobile-detail-photo{width:100%;height:190px;object-fit:cover;border-radius:9px;margin:0 0 14px}
+  .mobile-link{display:inline-block;margin:12px 0 18px;padding:10px 14px;border:1px solid rgba(255,255,255,.65);border-radius:6px;color:#fff;text-decoration:none}
+  .mobile-rsvp{display:grid;grid-template-columns:1fr;gap:13px;margin:0}
+  .mobile-rsvp label{display:grid;gap:6px;color:#fff;font:400 11px/1.4 Ubuntu,sans-serif}
+  .mobile-rsvp input,.mobile-rsvp select,.mobile-rsvp textarea{width:100%;min-height:42px;padding:11px;border:1px solid rgba(255,255,255,.5);border-radius:6px;background:rgba(0,0,0,.55);color:#fff;font:400 13px Ubuntu,sans-serif}
+  .mobile-rsvp select option{background:#111}
+  .mobile-submit{padding:13px;border:1px solid #fff;border-radius:6px;background:#fff;color:#111;font:500 12px Ubuntu,sans-serif}
+  .mobile-note{font:400 10px/1.6 Ubuntu,sans-serif;color:#ccc;margin:0}
+  .programme-highlight{padding:14px;margin:14px 0;border:1px solid rgba(255,255,255,.45);border-radius:9px;background:rgba(255,255,255,.09)}
+  .programme-highlight h3{font:400 22px 'DM Serif Display',serif;margin:6px 0}
+  .programme-highlight p,.announcement-note p{font:400 12px/1.6 Ubuntu,sans-serif;color:#ddd;margin:0}
+  .programme-row{grid-template-columns:58px 1fr;gap:10px;padding:13px 0}
+  .programme-row strong{font:500 12px Ubuntu,sans-serif}
+  .programme-row span{font:400 11px/1.5 Ubuntu,sans-serif}
+  .announcement-note{margin:18px 0;padding:14px}
+  .mobile-gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-bottom:12px}
+  .mobile-gallery-grid img{display:block;width:100%;height:190px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.3)}
+  .mobile-gallery-grid img:first-child{grid-column:1/-1;height:230px}
+  .carousel.swipe-next .story-card.is-active{animation:mobilePageEnterNext .42s cubic-bezier(.2,.75,.25,1) both}
+  .carousel.swipe-prev .story-card.is-active{animation:mobilePageEnterPrev .42s cubic-bezier(.2,.75,.25,1) both}
+}
+@media(prefers-reduced-motion:reduce){@media(max-width:760px){.carousel.swipe-next .story-card.is-active,.carousel.swipe-prev .story-card.is-active{animation:none}}}
