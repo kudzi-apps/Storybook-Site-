@@ -132,3 +132,20 @@ body{background-image:linear-gradient(90deg,rgba(0,0,0,.30),rgba(0,0,0,.08) 50%,
 /* Photo background with an always-visible bokeh fallback beneath it. */
 body{background-color:#100805!important;background-image:linear-gradient(90deg,rgba(0,0,0,.28),rgba(0,0,0,.08) 50%,rgba(0,0,0,.3)),linear-gradient(0deg,rgba(0,0,0,.3),rgba(0,0,0,.06) 50%,rgba(0,0,0,.24)),url("https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=2400&q=90")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
 #app{z-index:1;background:transparent!important}
+
+/* Programme panel and four equal guest destinations */
+.programme-panel{width:min(720px,100%)}
+.programme-highlight{padding:15px 17px;margin:14px 0;border:1px solid rgba(255,255,255,.48);border-radius:9px;background:rgba(255,255,255,.09)}
+.programme-highlight h3{margin:7px 0 4px;font:500 23px 'Cormorant Garamond',Georgia,serif}
+.programme-highlight p,.announcement-note p{margin:0;color:#ddd;font-size:12px;line-height:1.65}
+.programme-highlight.coming-up{border-color:rgba(237,28,36,.75);background:rgba(237,28,36,.09)}
+.programme-list{margin:22px 0}
+.programme-list>h3{font:500 25px 'Cormorant Garamond',Georgia,serif}
+.programme-row{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.17)}
+.programme-row time{color:#fff;font-size:11px;letter-spacing:.08em;padding-top:2px}
+.programme-row strong,.programme-row span{display:block}
+.programme-row strong{font-size:12px;font-weight:500}
+.programme-row span{margin-top:4px;color:#bbb;font-size:11px;line-height:1.5}
+.announcement-note{padding:15px 17px;border-left:3px solid var(--red);background:rgba(255,255,255,.07)}
+.announcement-note p{margin-top:8px}
+@media(max-width:760px){.programme-panel{max-height:88vh}.programme-row{grid-template-columns:52px 1fr;gap:8px}.programme-highlight{padding:13px}}
