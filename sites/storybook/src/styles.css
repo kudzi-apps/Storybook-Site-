@@ -209,3 +209,141 @@ body{background-color:#100805!important;background-image:linear-gradient(90deg,r
     bottom:22px;
   }
 }
+
+
+/* Mobile-only refinements: full-height active page, readable page content,
+   Storybook wordmark, and directional 3D transitions. */
+@media(max-width:760px){
+  .storybook-wordmark{
+    display:block;
+    color:#fff;
+    font:500 clamp(19px,5vw,27px)/1 'Cormorant Garamond',Georgia,serif;
+    letter-spacing:-.045em;
+    white-space:nowrap;
+  }
+  .brand-logo{flex-basis:clamp(92px,25vw,142px)}
+  main{padding:80px 0 82px}
+  .stage{padding:10px 0}
+  .carousel{
+    width:100%;
+    height:100%;
+    max-height:100%;
+    min-height:0;
+    perspective:1200px;
+    align-items:stretch;
+    overflow:visible;
+  }
+  .story-card{
+    flex:0 0 34px;
+    width:34px;
+    height:100%;
+    max-height:100%;
+    min-height:0;
+    aspect-ratio:auto;
+    border-radius:13px;
+    opacity:.76;
+    filter:brightness(.62) saturate(.72);
+    transform:scaleY(.965);
+    transition:flex-basis .48s cubic-bezier(.2,.75,.25,1),filter .48s,opacity .48s,transform .48s,box-shadow .48s;
+  }
+  .story-card.is-active{
+    flex:1 1 calc(100% - 68px);
+    width:calc(100% - 68px);
+    height:100%;
+    max-height:100%;
+    min-height:0;
+    aspect-ratio:auto;
+    border-radius:17px;
+    opacity:1;
+    filter:none;
+    transform:translateZ(22px) scaleY(1);
+    z-index:2;
+    box-shadow:0 22px 58px rgba(0,0,0,.58),0 0 0 1px rgba(255,255,255,.16);
+  }
+  .story-card:first-child:not(.is-active){
+    transform:translateX(8px) rotateY(-15deg) scaleY(.965);
+    transform-origin:right center;
+    z-index:1;
+  }
+  .story-card:last-child:not(.is-active){
+    transform:translateX(-8px) rotateY(15deg) scaleY(.965);
+    transform-origin:left center;
+    z-index:1;
+  }
+  .story-card:not(.is-active) .card-content{opacity:0}
+  .story-card.is-active .card-content{
+    left:clamp(18px,5vw,30px);
+    right:clamp(18px,5vw,30px);
+    top:clamp(24px,6vh,58px);
+    bottom:auto;
+    align-items:flex-start;
+    text-align:left;
+    gap:0;
+    opacity:1;
+  }
+  .story-card.is-active .card-icon{
+    width:32px;height:32px;margin-bottom:clamp(15px,3vh,28px);
+  }
+  .story-card.is-active .card-kicker{
+    display:block;
+    color:rgba(255,255,255,.88);
+    font-size:9px;
+    line-height:1.5;
+    letter-spacing:.17em;
+    text-transform:uppercase;
+    margin-bottom:9px;
+  }
+  .story-card.is-active .card-content strong{
+    display:block;
+    max-width:100%;
+    margin:0 0 12px;
+    font:500 clamp(27px,7vw,42px)/1.02 'Cormorant Garamond',Georgia,serif;
+    text-align:left;
+    overflow-wrap:anywhere;
+  }
+  .story-card.is-active .card-description{
+    display:block;
+    max-width:34ch;
+    color:rgba(255,255,255,.92);
+    font-size:clamp(12px,3.2vw,14px);
+    line-height:1.65;
+    text-align:left;
+  }
+  .story-card.is-active .card-action{
+    display:inline-block;
+    margin-top:20px;
+    padding:10px 0 5px;
+    border-bottom:2px solid var(--red);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    text-align:left;
+  }
+  .story-card.is-active .card-shade{
+    background:linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.34) 68%,rgba(0,0,0,.16)),linear-gradient(0deg,rgba(0,0,0,.48),transparent 58%);
+  }
+  .carousel.swipe-next .story-card.is-active{animation:mobilePageEnterNext .48s cubic-bezier(.2,.75,.25,1) both}
+  .carousel.swipe-prev .story-card.is-active{animation:mobilePageEnterPrev .48s cubic-bezier(.2,.75,.25,1) both}
+  @keyframes mobilePageEnterNext{
+    from{opacity:.55;transform:translate3d(34px,0,-30px) rotateY(-8deg) scale(.97)}
+    to{opacity:1;transform:translate3d(0,0,22px) rotateY(0) scale(1)}
+  }
+  @keyframes mobilePageEnterPrev{
+    from{opacity:.55;transform:translate3d(-34px,0,-30px) rotateY(8deg) scale(.97)}
+    to{opacity:1;transform:translate3d(0,0,22px) rotateY(0) scale(1)}
+  }
+}
+@media(max-width:390px){
+  .storybook-wordmark{font-size:19px}
+  .story-card.is-active .card-content{top:24px}
+}
+@media(prefers-reduced-motion:reduce){
+  @media(max-width:760px){.carousel.swipe-next .story-card.is-active,.carousel.swipe-prev .story-card.is-active{animation:none}}
+}
+
+/* Keep the rebrand confined to mobile; desktop retains the original wordmark. */
+.storybook-wordmark{display:none}
+@media(max-width:760px){
+  .brand-logo .wordmark-fallback{display:none}
+  .brand-logo .storybook-wordmark{display:block}
+}
