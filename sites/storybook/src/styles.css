@@ -340,3 +340,10 @@ body{background-color:#100805!important;background-image:linear-gradient(90deg,r
 @media(prefers-reduced-motion:reduce){
   @media(max-width:760px){.carousel.swipe-next .story-card.is-active,.carousel.swipe-prev .story-card.is-active{animation:none}}
 }
+
+/* Keep the rebrand confined to mobile; desktop retains the original wordmark. */
+.storybook-wordmark{display:none}
+@media(max-width:760px){
+  .brand-logo .wordmark-fallback{display:none}
+  .brand-logo .storybook-wordmark{display:block}
+}
