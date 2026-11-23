@@ -168,8 +168,50 @@ export default {
       return response({ projects }, request, env, 200, { "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=600" });
     }
 
+    if (url.pathname === "/api/public/enquiries" && request.method === "POST") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const body = await request.json().catch(() => null);
+      if (!body || body.website) return response({ ok: true }, request, env, 202);
+      const name = String(body.name || "").trim().slice(0, 120);
+      const phone = String(body.phone || "").trim().slice(0, 60);
+      const email = String(body.email || "").trim().slice(0, 160);
+      const location = String(body.location || "").trim().slice(0, 200);
+      const eventDate = String(body.date || "").trim().slice(0, 40);
+      const services = Array.isArray(body.services) ? body.services.slice(0, 20).map(s => String(s).slice(0, 240)) : [];
+      if (!name || !phone || !location || !eventDate || !services.length) return response({ error: "Name, phone, location, date and services are required" }, request, env, 400);
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return response({ error: "Enter a valid email address" }, request, env, 400);
+      const quote = Number.isFinite(Number(body.quoteAmount)) && body.quoteAmount !== "" ? Number(body.quoteAmount) : null;
+      const id = crypto.randomUUID();
+      await env.db.prepare("INSERT INTO enquiries (id,client_name,phone,email,event_date,location,services_json,quote_amount,status) VALUES (?,?,?,?,?,?,?,?,?)")
+        .bind(id,name,phone,email,eventDate,location,JSON.stringify(services),quote,"new").run();
+      return response({ ok: true, id }, request, env, 201);
+    }
+
     const denied = await requireAdmin(request, env);
     if (denied) return response({ error: "Unauthorised" }, request, env, 401);
+
+    if (url.pathname === "/api/enquiries" && request.method === "GET") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const rows = await env.db.prepare("SELECT * FROM enquiries ORDER BY CASE status WHEN 'new' THEN 0 WHEN 'contacted' THEN 1 WHEN 'negotiating' THEN 2 WHEN 'confirmed' THEN 3 ELSE 4 END, created_at DESC").all();
+      const enquiries = (rows.results || []).map(row => ({ ...row, services: JSON.parse(row.services_json || "[]") }));
+      return response({ enquiries }, request, env);
+    }
+    if (url.pathname.startsWith("/api/enquiries/") && request.method === "PUT") {
+      if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
+      const id = url.pathname.slice("/api/enquiries/".length);
+      if (!id || id.includes("/")) return response({ error: "Invalid enquiry ID" }, request, env, 400);
+      const body = await request.json().catch(() => null);
+      if (!body) return response({ error: "Invalid enquiry data" }, request, env, 400);
+      const current = await env.db.prepare("SELECT * FROM enquiries WHERE id=?").bind(id).first();
+      if (!current) return response({ error: "Enquiry not found" }, request, env, 404);
+      const status = body.status ?? current.status;
+      if (!["new","contacted","negotiating","confirmed","declined"].includes(status)) return response({ error: "Invalid enquiry status" }, request, env, 400);
+      const quote = body.quoteAmount === undefined ? current.quote_amount : (body.quoteAmount === "" || body.quoteAmount === null ? null : Number(body.quoteAmount));
+      if (quote !== null && (!Number.isFinite(quote) || quote < 0 || quote > 10000000)) return response({ error: "Invalid quote amount" }, request, env, 400);
+      const notes = body.notes === undefined ? current.notes : String(body.notes).slice(0, 4000);
+      await env.db.prepare("UPDATE enquiries SET status=?,quote_amount=?,notes=?,updated_at=datetime('now') WHERE id=?").bind(status,quote,notes,id).run();
+      return response({ updated: true, id }, request, env);
+    }
 
     if (url.pathname === "/api/projects" && request.method === "GET") {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
