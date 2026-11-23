@@ -177,13 +177,13 @@ export default {
       const email = String(body.email || "").trim().slice(0, 160);
       const location = String(body.location || "").trim().slice(0, 200);
       const eventDate = String(body.date || "").trim().slice(0, 40);
-      const services = Array.isArray(body.services) ? body.services.slice(0, 20).map(s => String(s).slice(0, 240)) : [];
+      const services = Array.isArray(body.services) ? body.services.slice(0, 20).map(s => String(s).slice(0, 240)) : [];\n      const brief = String(body.brief || "").trim().slice(0, 4000);
       if (!name || !phone || !location || !eventDate || !services.length) return response({ error: "Name, phone, location, date and services are required" }, request, env, 400);
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return response({ error: "Enter a valid email address" }, request, env, 400);
       const quote = Number.isFinite(Number(body.quoteAmount)) && body.quoteAmount !== "" ? Number(body.quoteAmount) : null;
       const id = crypto.randomUUID();
-      await env.db.prepare("INSERT INTO enquiries (id,client_name,phone,email,event_date,location,services_json,quote_amount,status) VALUES (?,?,?,?,?,?,?,?,?)")
-        .bind(id,name,phone,email,eventDate,location,JSON.stringify(services),quote,"new").run();
+      await env.db.prepare("INSERT INTO enquiries (id,client_name,phone,email,event_date,location,services_json,quote_amount,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?)")
+        .bind(id,name,phone,email,eventDate,location,JSON.stringify(services),quote,"new",brief).run();
       return response({ ok: true, id }, request, env, 201);
     }
 
