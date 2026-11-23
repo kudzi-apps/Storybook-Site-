@@ -177,7 +177,8 @@ export default {
       const email = String(body.email || "").trim().slice(0, 160);
       const location = String(body.location || "").trim().slice(0, 200);
       const eventDate = String(body.date || "").trim().slice(0, 40);
-      const services = Array.isArray(body.services) ? body.services.slice(0, 20).map(s => String(s).slice(0, 240)) : [];\n      const brief = String(body.brief || "").trim().slice(0, 4000);
+      const services = Array.isArray(body.services) ? body.services.slice(0, 20).map(s => String(s).slice(0, 240)) : [];
+      const brief = String(body.brief || "").trim().slice(0, 4000);
       if (!name || !phone || !location || !eventDate || !services.length) return response({ error: "Name, phone, location, date and services are required" }, request, env, 400);
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return response({ error: "Enter a valid email address" }, request, env, 400);
       const quote = Number.isFinite(Number(body.quoteAmount)) && body.quoteAmount !== "" ? Number(body.quoteAmount) : null;
