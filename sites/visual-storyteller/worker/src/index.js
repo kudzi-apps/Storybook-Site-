@@ -172,6 +172,15 @@ export default {
       if (!env.db) return response({ error: "D1 binding DB is not configured" }, request, env, 503);
       const body = await request.json().catch(() => null);
       if (!body || body.website) return response({ ok: true }, request, env, 202);
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const ipDigest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip));
+      const ipHash = [...new Uint8Array(ipDigest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+      const now = Math.floor(Date.now() / 1000), windowSeconds = 900, cutoff = now - windowSeconds;
+      try {
+        await env.db.prepare("DELETE FROM public_enquiry_limits WHERE window_started < ?").bind(now - 86400).run();
+        const limitRow = await env.db.prepare("INSERT INTO public_enquiry_limits (ip_hash,window_started,submissions) VALUES (?,?,1) ON CONFLICT(ip_hash) DO UPDATE SET submissions=CASE WHEN public_enquiry_limits.window_started <= ? THEN 1 ELSE public_enquiry_limits.submissions+1 END, window_started=CASE WHEN public_enquiry_limits.window_started <= ? THEN excluded.window_started ELSE public_enquiry_limits.window_started END RETURNING submissions,window_started").bind(ipHash,now,cutoff,cutoff).first();
+        if (limitRow && limitRow.submissions > 4) return response({ error: "Too many enquiries sent. Please try again later." }, request, env, 429, { "retry-after": String(Math.max(1,limitRow.window_started+windowSeconds-now)) });
+      } catch { return response({ error: "Enquiry protection is temporarily unavailable" }, request, env, 503); }
       const name = String(body.name || "").trim().slice(0, 120);
       const phone = String(body.phone || "").trim().slice(0, 60);
       const email = String(body.email || "").trim().slice(0, 160);
