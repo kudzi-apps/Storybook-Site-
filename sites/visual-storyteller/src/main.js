@@ -143,7 +143,7 @@ document.addEventListener("click",function(event){
  const menu=target.closest(".menu-toggle");
  if(menu){const topbar=menu.closest(".topbar");if(topbar)topbar.classList.toggle("menu-open");return;}
  const panelButton=target.closest("[data-panel]");
- if(panelButton){event.preventDefault();openPanel(panelButton.dataset.panel);return;}
+ if(panelButton){event.preventDefault();if(panelButton.dataset.panel==="Storybook"){window.open("https://storybook-site.pages.dev/","_blank","noopener,noreferrer");return;}openPanel(panelButton.dataset.panel);return;}
  const tile=target.closest(".spatial-tile");
  if(tile){
   const service=tile.dataset.service||"Photography";
