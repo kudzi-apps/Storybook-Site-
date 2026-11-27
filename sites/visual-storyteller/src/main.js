@@ -147,6 +147,7 @@ document.addEventListener("click",function(event){
  const tile=target.closest(".spatial-tile");
  if(tile){
   const service=tile.dataset.service||"Photography";
+  if(service==="Storybook"){window.open("https://storybook-site.pages.dev/","_blank","noopener,noreferrer");return;}
   const mapped=service==="Digital Experiences"?"Storybook":service==="Events & Brands"?"Event Package":service==="Selected Work"||service==="Portraits & People"?"Photography":service;
   if(configs[mapped])openPanel(mapped);
   return;
