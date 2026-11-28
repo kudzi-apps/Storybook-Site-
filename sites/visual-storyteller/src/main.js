@@ -289,4 +289,6 @@ function renderFAQ(){const items=[["How do I book?","Choose a service and packag
   root.setProperty("--vs-bg-desktop-tilt",Math.max(0,Math.min(60,Number(bg.desktopTilt??50)))+"deg");
   document.body.style.color=color(c.font);
  }catch(error){/* Retain the default design if settings are unavailable. */}
+
+ if(new URLSearchParams(window.location.search).get("quote")==="1"){openPanel("Get a Quote");}
 })();
